@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
   const origem_id = searchParams.get('origem_id');
   const destino_id = searchParams.get('destino_id');
 
-  const conditions: string[] = ['l.ativo = true'];
-  const values: any[] = [];
-  let idx = 1;
+  const conditions: string[] = ['l.ativo = true', `l.usuario_id = $1`];
+  const values: any[] = [user.id];
+  let idx = 2;
 
   if (tipo) {
     conditions.push(`l.tipo = $${idx++}`);

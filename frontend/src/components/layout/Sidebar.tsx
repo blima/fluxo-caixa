@@ -10,6 +10,7 @@ import {
   MapPinIcon,
   FlagIcon,
   CreditCardIcon,
+  UsersIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 
@@ -33,6 +34,7 @@ const navigation: NavItem[] = [
       { name: 'Destinos', href: '/cadastros/destinos', icon: FlagIcon },
       { name: 'Etiquetas', href: '/cadastros/etiquetas', icon: TagIcon },
       { name: 'Tipos de Pagamento', href: '/cadastros/tipos-pagamento', icon: CreditCardIcon },
+      { name: 'Usuários', href: '/cadastros/usuarios', icon: UsersIcon },
     ],
   },
 ];

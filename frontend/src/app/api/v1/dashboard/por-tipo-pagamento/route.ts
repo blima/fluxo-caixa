@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
   const de = searchParams.get('de');
   const ate = searchParams.get('ate');
 
-  const conditions: string[] = ['l.ativo = true'];
-  const values: any[] = [];
-  let idx = 1;
+  const conditions: string[] = ['l.ativo = true', 'l.usuario_id = $1'];
+  const values: any[] = [user.id];
+  let idx = 2;
 
   if (de) {
     conditions.push(`l.data_evento >= $${idx++}`);

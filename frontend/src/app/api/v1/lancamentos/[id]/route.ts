@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { queryOne } from '@/lib/db';
 import { getAuthUser, unauthorized, notFound, badRequest } from '@/lib/auth';
 
-async function findLancamentoWithRelations(id: string) {
+async function findLancamentoWithRelations(id: string, userId: string) {
   return queryOne(
     `SELECT l.*,
       row_to_json(o) as origem,
@@ -14,8 +14,8 @@ async function findLancamentoWithRelations(id: string) {
     LEFT JOIN destinos d ON d.id = l.destino_id
     LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
     LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
-    WHERE l.id = $1 AND l.ativo = true`,
-    [id],
+    WHERE l.id = $1 AND l.ativo = true AND l.usuario_id = $2`,
+    [id, userId],
   );
 }
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
-  const row = await findLancamentoWithRelations(params.id);
+  const row = await findLancamentoWithRelations(params.id, user.id);
   if (!row) return notFound('Lançamento não encontrado');
   return NextResponse.json(row);
 }
@@ -34,8 +34,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (!user) return unauthorized();
 
     const existing = await queryOne<any>(
-      'SELECT * FROM lancamentos WHERE id = $1 AND ativo = true',
-      [params.id],
+      'SELECT * FROM lancamentos WHERE id = $1 AND ativo = true AND usuario_id = $2',
+      [params.id, user.id],
     );
     if (!existing) return notFound('Lançamento não encontrado');
 
@@ -64,7 +64,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     if (fields.length === 0) {
-      const row = await findLancamentoWithRelations(params.id);
+      const row = await findLancamentoWithRelations(params.id, user.id);
       return NextResponse.json(row);
     }
 
@@ -76,7 +76,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       values,
     );
 
-    const row = await findLancamentoWithRelations(params.id);
+    const row = await findLancamentoWithRelations(params.id, user.id);
     return NextResponse.json(row);
   } catch (error: any) {
     return NextResponse.json(
@@ -90,12 +90,12 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   const user = await getAuthUser(request);
   if (!user) return unauthorized();
 
-  const existing = await queryOne('SELECT * FROM lancamentos WHERE id = $1 AND ativo = true', [params.id]);
+  const existing = await queryOne('SELECT * FROM lancamentos WHERE id = $1 AND ativo = true AND usuario_id = $2', [params.id, user.id]);
   if (!existing) return notFound('Lançamento não encontrado');
 
   const row = await queryOne(
-    'UPDATE lancamentos SET ativo = false, updated_at = NOW() WHERE id = $1 RETURNING *',
-    [params.id],
+    'UPDATE lancamentos SET ativo = false, updated_at = NOW() WHERE id = $1 AND usuario_id = $2 RETURNING *',
+    [params.id, user.id],
   );
   return NextResponse.json(row);
 }

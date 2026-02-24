@@ -2,6 +2,9 @@ export interface User {
   id: string;
   nome: string;
   email: string;
+  ativo?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Origem {

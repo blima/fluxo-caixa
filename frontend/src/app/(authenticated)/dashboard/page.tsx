@@ -36,8 +36,15 @@ export default function DashboardPage() {
   const [porOrigem, setPorOrigem] = useState<DadosPorCategoria[]>([]);
   const [porDestino, setPorDestino] = useState<DadosPorCategoria[]>([]);
   const [saldo, setSaldo] = useState<SaldoDiario[]>([]);
-  const [de, setDe] = useState('');
-  const [ate, setAte] = useState('');
+  const [de, setDe] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+  });
+  const [ate, setAte] = useState(() => {
+    const now = new Date();
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return `${last.getFullYear()}-${String(last.getMonth() + 1).padStart(2, '0')}-${String(last.getDate()).padStart(2, '0')}`;
+  });
 
   const load = async () => {
     setLoading(true);
