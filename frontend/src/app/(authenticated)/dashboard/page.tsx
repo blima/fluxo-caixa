@@ -21,6 +21,7 @@ import {
   ScaleIcon,
   PlusIcon,
   CalendarDaysIcon,
+  HomeIcon,
 } from '@heroicons/react/24/outline';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -346,7 +347,10 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <HomeIcon className="h-7 w-7 text-primary-600" />
+            Fluxo de Caixa
+          </h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="btn-primary hidden sm:flex items-center gap-2">
