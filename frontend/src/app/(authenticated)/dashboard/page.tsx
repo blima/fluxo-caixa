@@ -140,25 +140,25 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
-        <div className="flex items-end gap-2 sm:gap-3">
-          <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2 h-[38px]">
-            <PlusIcon className="h-5 w-5" />
-            <span className="hidden sm:inline">Novo Lançamento</span>
-            <span className="sm:hidden">Novo</span>
-          </button>
-          <div className="flex-1 sm:flex-none">
-            <label className="text-xs text-gray-500 block">De</label>
-            <DateInput value={de} onChange={setDe} />
-          </div>
-          <div className="flex-1 sm:flex-none">
-            <label className="text-xs text-gray-500 block">Até</label>
-            <DateInput value={ate} onChange={setAte} />
-          </div>
+        <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2">
+          <PlusIcon className="h-5 w-5" />
+          <span className="hidden sm:inline">Novo Lançamento</span>
+          <span className="sm:hidden">Novo</span>
+        </button>
+      </div>
+      <div className="flex items-end gap-2 sm:gap-3 mb-6">
+        <div className="flex-1 sm:flex-none sm:w-40">
+          <label className="text-xs text-gray-500 block">De</label>
+          <DateInput value={de} onChange={setDe} />
+        </div>
+        <div className="flex-1 sm:flex-none sm:w-40">
+          <label className="text-xs text-gray-500 block">Até</label>
+          <DateInput value={ate} onChange={setAte} />
         </div>
       </div>
 
