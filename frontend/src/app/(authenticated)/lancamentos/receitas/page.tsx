@@ -186,12 +186,12 @@ export default function ReceitasPage() {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Data</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descri\u00e7\u00e3o</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Origem</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Etiqueta</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Pagamento</th>
                     <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor</th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">A\u00e7\u00f5es</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -228,7 +228,7 @@ export default function ReceitasPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-1 sm:col-span-2">
-              <label className="label-field">Descri\u00e7\u00e3o</label>
+              <label className="label-field">Descrição</label>
               <input type="text" className="input-field" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
             </div>
             <div>
@@ -244,7 +244,7 @@ export default function ReceitasPage() {
               <select className="input-field" value={origemId} onChange={(e) => setOrigemId(e.target.value)} required>
                 <option value="">Selecione...</option>
                 {origens.map((o) => (
-                  <option key={o.id} value={o.id}>{o.nome}{o.padrao ? ' (Padr\u00e3o)' : ''}</option>
+                  <option key={o.id} value={o.id}>{o.nome}{o.padrao ? ' (Padrão)' : ''}</option>
                 ))}
               </select>
             </div>
@@ -253,7 +253,7 @@ export default function ReceitasPage() {
               <select className="input-field" value={etiquetaId} onChange={(e) => setEtiquetaId(e.target.value)} required>
                 <option value="">Selecione...</option>
                 {etiquetas.map((e) => (
-                  <option key={e.id} value={e.id}>{e.nome}{e.padrao ? ' (Padr\u00e3o)' : ''}</option>
+                  <option key={e.id} value={e.id}>{e.nome}{e.padrao ? ' (Padrão)' : ''}</option>
                 ))}
               </select>
             </div>
