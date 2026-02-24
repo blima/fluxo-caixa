@@ -27,8 +27,9 @@ export async function comparePassword(password: string, hash: string): Promise<b
 
 export interface AuthUser {
   id: string;
-  email: string;
   nome: string;
+  nome_usuario: string;
+  email: string;
 }
 
 export async function getAuthUser(request: NextRequest): Promise<AuthUser | null> {
@@ -40,7 +41,7 @@ export async function getAuthUser(request: NextRequest): Promise<AuthUser | null
   if (!payload) return null;
 
   const user = await queryOne<AuthUser>(
-    'SELECT id, email, nome FROM users WHERE id = $1 AND ativo = true',
+    'SELECT id, nome, nome_usuario, email FROM users WHERE id = $1 AND ativo = true',
     [payload.sub],
   );
   return user;

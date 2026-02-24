@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   if (!user) return unauthorized();
 
   const row = await queryOne(
-    'SELECT id, nome, email, ativo, created_at, updated_at FROM users WHERE id = $1 AND ativo = true',
+    'SELECT id, nome, nome_usuario, email, ativo, created_at, updated_at FROM users WHERE id = $1 AND ativo = true',
     [params.id],
   );
   if (!row) return notFound('Usuário não encontrado');
@@ -29,11 +29,16 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       if (dup) return conflict('Email já cadastrado');
     }
 
+    if (body.nome_usuario) {
+      const dup = await queryOne('SELECT id FROM users WHERE nome_usuario = $1 AND id != $2', [body.nome_usuario, params.id]);
+      if (dup) return conflict('Nome de usuário já cadastrado');
+    }
+
     const fields: string[] = [];
     const values: any[] = [];
     let idx = 1;
 
-    for (const key of ['nome', 'email']) {
+    for (const key of ['nome', 'nome_usuario', 'email']) {
       if (body[key] !== undefined) {
         fields.push(`${key} = $${idx++}`);
         values.push(body[key]);
@@ -52,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     values.push(params.id);
 
     const row = await queryOne(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, nome, email, ativo, created_at, updated_at`,
+      `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx} RETURNING id, nome, nome_usuario, email, ativo, created_at, updated_at`,
       values,
     );
     return NextResponse.json(row);
@@ -76,7 +81,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   if (!existing) return notFound('Usuário não encontrado');
 
   const row = await queryOne(
-    'UPDATE users SET ativo = false, updated_at = NOW() WHERE id = $1 RETURNING id, nome, email, ativo, created_at, updated_at',
+    'UPDATE users SET ativo = false, updated_at = NOW() WHERE id = $1 RETURNING id, nome, nome_usuario, email, ativo, created_at, updated_at',
     [params.id],
   );
   return NextResponse.json(row);

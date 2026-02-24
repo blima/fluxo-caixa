@@ -27,16 +27,19 @@ export default function UsuariosPage() {
   } = useCrud<User>(usersApi);
 
   const [nome, setNome] = useState('');
+  const [nomeUsuario, setNomeUsuario] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
   useEffect(() => {
     if (editing) {
       setNome(editing.nome);
+      setNomeUsuario(editing.nome_usuario);
       setEmail(editing.email);
       setSenha('');
     } else {
       setNome('');
+      setNomeUsuario('');
       setEmail('');
       setSenha('');
     }
@@ -44,7 +47,7 @@ export default function UsuariosPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data: any = { nome, email };
+    const data: any = { nome, nome_usuario: nomeUsuario, email };
     if (senha) data.senha = senha;
     save(data);
   };
@@ -84,7 +87,7 @@ export default function UsuariosPage() {
                 <div key={item.id} className="p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900">{item.nome}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{item.email}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">@{item.nome_usuario} &middot; {item.email}</p>
                   </div>
                   <div className="flex items-center gap-3 ml-3">
                     <button onClick={() => openEdit(item)} className="text-gray-400 active:text-primary-600">
@@ -101,6 +104,7 @@ export default function UsuariosPage() {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Usuário</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
                 </tr>
@@ -109,6 +113,7 @@ export default function UsuariosPage() {
                 {items.map((item) => (
                   <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nome}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">@{item.nome_usuario}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.email}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -139,6 +144,20 @@ export default function UsuariosPage() {
               onChange={(e) => setNome(e.target.value)}
               required
               minLength={2}
+            />
+          </div>
+          <div>
+            <label className="label-field">Nome de Usuário</label>
+            <input
+              type="text"
+              className="input-field"
+              value={nomeUsuario}
+              onChange={(e) => setNomeUsuario(e.target.value.toLowerCase().replace(/\s/g, ''))}
+              required
+              minLength={3}
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder="ex: joao.silva"
             />
           </div>
           <div>

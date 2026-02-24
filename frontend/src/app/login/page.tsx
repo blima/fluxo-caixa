@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 import toast from 'react-hot-toast';
 export default function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const [nomeUsuario, setNomeUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email, senha);
+      await login(nomeUsuario, senha);
       toast.success('Login realizado com sucesso!');
     } catch (err: any) {
       toast.error(
@@ -54,14 +54,16 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label-field">Email</label>
+              <label className="label-field">Usuário</label>
               <input
-                type="email"
+                type="text"
                 className="input-field"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nome de usuário"
+                value={nomeUsuario}
+                onChange={(e) => setNomeUsuario(e.target.value)}
                 required
+                autoCapitalize="none"
+                autoCorrect="off"
               />
             </div>
             <div>

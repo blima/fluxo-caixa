@@ -31,9 +31,9 @@ export default api;
 
 // Auth
 export const authApi = {
-  login: (data: { email: string; senha: string }) =>
+  login: (data: { nome_usuario: string; senha: string }) =>
     api.post('/auth/login', data),
-  register: (data: { nome: string; email: string; senha: string }) =>
+  register: (data: { nome: string; nome_usuario: string; email: string; senha: string }) =>
     api.post('/auth/register', data),
   me: () => api.get('/auth/me'),
 };

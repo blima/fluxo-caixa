@@ -4,11 +4,11 @@ import { comparePassword, signToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, senha } = await request.json();
+    const { nome_usuario, senha } = await request.json();
 
-    if (!email || !senha) {
+    if (!nome_usuario || !senha) {
       return NextResponse.json(
-        { statusCode: 400, message: 'Email e senha são obrigatórios' },
+        { statusCode: 400, message: 'Usuário e senha são obrigatórios' },
         { status: 400 },
       );
     }
@@ -16,9 +16,10 @@ export async function POST(request: NextRequest) {
     const user = await queryOne<{
       id: string;
       nome: string;
+      nome_usuario: string;
       email: string;
       senha_hash: string;
-    }>('SELECT id, nome, email, senha_hash FROM users WHERE email = $1 AND ativo = true', [email]);
+    }>('SELECT id, nome, nome_usuario, email, senha_hash FROM users WHERE nome_usuario = $1 AND ativo = true', [nome_usuario]);
 
     if (!user) {
       return NextResponse.json(
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     const access_token = signToken({ sub: user.id, email: user.email });
     return NextResponse.json({
       access_token,
-      user: { id: user.id, nome: user.nome, email: user.email },
+      user: { id: user.id, nome: user.nome, nome_usuario: user.nome_usuario, email: user.email },
     });
   } catch (error: any) {
     return NextResponse.json(

@@ -359,18 +359,20 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* Filtros de período */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="flex-1 sm:flex-none sm:w-40">
-          <DateInput value={de} onChange={setDe} />
+      {/* Filtros de período + botão mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 flex-1 sm:flex-none">
+          <div className="flex-1 sm:flex-none sm:w-40">
+            <DateInput value={de} onChange={setDe} />
+          </div>
+          <span className="text-gray-400 text-xs">até</span>
+          <div className="flex-1 sm:flex-none sm:w-40">
+            <DateInput value={ate} onChange={setAte} />
+          </div>
         </div>
-        <span className="text-gray-400 text-xs">até</span>
-        <div className="flex-1 sm:flex-none sm:w-40">
-          <DateInput value={ate} onChange={setAte} />
-        </div>
-        <button onClick={() => setModalOpen(true)} className="btn-primary sm:hidden flex items-center gap-1 whitespace-nowrap">
+        <button onClick={() => setModalOpen(true)} className="btn-primary sm:hidden flex items-center justify-center gap-1 w-full">
           <PlusIcon className="h-5 w-5" />
-          Novo
+          Novo Lançamento
         </button>
       </div>
 

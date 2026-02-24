@@ -17,6 +17,7 @@ CREATE TYPE tipo_lancamento_enum AS ENUM ('receita', 'despesa');
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR(150) NOT NULL,
+    nome_usuario VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
