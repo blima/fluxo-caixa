@@ -85,18 +85,15 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
     );
   }, [tiposPagamento, tipo]);
 
-  // Atualiza tipo_pagamento_id quando o filtro muda (troca de receita/despesa)
+  // Atualiza tipo_pagamento_id quando troca receita/despesa — sempre busca o padrão do tipo
   useEffect(() => {
     if (!editing && tiposPagamentoFiltrados.length > 0) {
-      const currentExists = tiposPagamentoFiltrados.find((tp) => tp.id === tipoPagamentoId);
-      if (!currentExists) {
-        const padrao = tiposPagamentoFiltrados.find((tp) =>
-          tipo === 'receita' ? tp.padrao_receita : tp.padrao_despesa
-        );
-        setTipoPagamentoId(padrao?.id || tiposPagamentoFiltrados[0].id);
-      }
+      const padrao = tiposPagamentoFiltrados.find((tp) =>
+        tipo === 'receita' ? tp.padrao_receita : tp.padrao_despesa
+      );
+      setTipoPagamentoId(padrao?.id || tiposPagamentoFiltrados[0].id);
     }
-  }, [tiposPagamentoFiltrados, editing, tipo]);
+  }, [tipo, editing]);
 
   // Taxa do tipo de pagamento selecionado
   const tipoPagamentoSelecionado = tiposPagamento.find((t) => t.id === tipoPagamentoId);
