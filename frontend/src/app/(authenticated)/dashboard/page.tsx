@@ -123,13 +123,13 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex-1 sm:flex-none">
             <label className="text-xs text-gray-500 block">De</label>
             <input
               type="date"
@@ -138,7 +138,7 @@ export default function DashboardPage() {
               onChange={(e) => setDe(e.target.value)}
             />
           </div>
-          <div>
+          <div className="flex-1 sm:flex-none">
             <label className="text-xs text-gray-500 block">Até</label>
             <input
               type="date"
@@ -151,19 +151,19 @@ export default function DashboardPage() {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {cards.map((card) => (
           <div
             key={card.title}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-5"
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-5"
           >
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-gray-500">{card.title}</p>
-              <div className={`p-2 rounded-lg ${card.bg}`}>
-                <card.icon className={`h-5 w-5 ${card.color}`} />
+              <p className="text-xs sm:text-sm font-medium text-gray-500">{card.title}</p>
+              <div className={`p-1.5 sm:p-2 rounded-lg ${card.bg}`}>
+                <card.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.color}`} />
               </div>
             </div>
-            <p className={`text-2xl font-bold mt-2 ${card.color}`}>
+            <p className={`text-lg sm:text-2xl font-bold mt-1 sm:mt-2 ${card.color}`}>
               {(card as any).isCurrency === false
                 ? card.value
                 : formatCurrency(card.value)}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
             categories={['receitas', 'despesas']}
             colors={['emerald', 'red']}
             valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={80}
+            yAxisWidth={48}
           />
         </Card>
 
@@ -194,13 +194,13 @@ export default function DashboardPage() {
           <Title>Saldo Acumulado</Title>
           <Text>Evolução do saldo ao longo do tempo</Text>
           <AreaChart
-            className="mt-4 h-72"
+            className="mt-4 h-60 sm:h-72"
             data={saldo}
             index="data"
             categories={['saldo']}
             colors={['blue']}
             valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={80}
+            yAxisWidth={48}
           />
         </Card>
       </div>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
             categories={['valor']}
             colors={['emerald']}
             valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={80}
+            yAxisWidth={48}
             layout="vertical"
           />
         </Card>
@@ -247,7 +247,7 @@ export default function DashboardPage() {
             categories={['valor']}
             colors={['red']}
             valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={80}
+            yAxisWidth={48}
             layout="vertical"
           />
         </Card>

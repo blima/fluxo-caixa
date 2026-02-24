@@ -60,12 +60,13 @@ export default function EtiquetasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Etiquetas</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Etiquetas</h1>
           <p className="text-sm text-gray-500">Categorize seus lançamentos</p>
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <PlusIcon className="h-5 w-5" />
-          Nova Etiqueta
+          <span className="hidden sm:inline">Nova Etiqueta</span>
+          <span className="sm:hidden">Nova</span>
         </button>
       </div>
 
@@ -77,46 +78,63 @@ export default function EtiquetasPage() {
             <button onClick={openCreate} className="btn-primary text-sm">Criar primeira etiqueta</button>
           } />
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Cor</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Padrão</th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div className="sm:hidden divide-y divide-gray-100">
               {items.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="h-6 w-6 rounded-full" style={{ backgroundColor: item.cor }} />
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    <Badge color={item.cor}>{item.nome}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{item.descricao || '-'}</td>
-                  <td className="px-6 py-4 text-center">
-                    {item.padrao ? <Badge variant="primary">Padrão</Badge> : null}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => setPadrao(item.id)} className="text-gray-400 hover:text-yellow-500 transition-colors" title="Definir como padrão">
-                        {item.padrao ? <StarSolidIcon className="h-5 w-5 text-yellow-500" /> : <StarIcon className="h-5 w-5" />}
-                      </button>
-                      <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors" title="Editar">
-                        <PencilSquareIcon className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
+                <div key={item.id} className="p-4 flex items-center justify-between">
+                  <div className="flex-1 min-w-0 flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full flex-shrink-0" style={{ backgroundColor: item.cor }} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                        {item.nome}
+                        {item.padrao && <Badge variant="primary">Padrão</Badge>}
+                      </p>
+                      {item.descricao && <p className="text-xs text-gray-500 mt-0.5 truncate">{item.descricao}</p>}
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="flex items-center gap-3 ml-3">
+                    <button onClick={() => setPadrao(item.id)} className="text-gray-400 active:text-yellow-500">
+                      {item.padrao ? <StarSolidIcon className="h-5 w-5 text-yellow-500" /> : <StarIcon className="h-5 w-5" />}
+                    </button>
+                    <button onClick={() => openEdit(item)} className="text-gray-400 active:text-primary-600">
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => remove(item.id)} className="text-gray-400 active:text-red-600">
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+            <table className="w-full hidden sm:table">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Cor</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Padrão</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="px-6 py-4"><div className="h-6 w-6 rounded-full" style={{ backgroundColor: item.cor }} /></td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900"><Badge color={item.cor}>{item.nome}</Badge></td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.descricao || '-'}</td>
+                    <td className="px-6 py-4 text-center">{item.padrao ? <Badge variant="primary">Padrão</Badge> : null}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => setPadrao(item.id)} className="text-gray-400 hover:text-yellow-500 transition-colors"><StarIcon className="h-5 w-5" /></button>
+                        <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors"><PencilSquareIcon className="h-5 w-5" /></button>
+                        <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors"><TrashIcon className="h-5 w-5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
 
@@ -135,23 +153,12 @@ export default function EtiquetasPage() {
             <div className="flex items-center gap-3">
               <div className="flex gap-2 flex-wrap">
                 {COLORS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setCor(c)}
-                    className={`h-8 w-8 rounded-full transition-all ${
-                      cor === c ? 'ring-2 ring-offset-2 ring-primary-500 scale-110' : 'hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: c }}
-                  />
+                  <button key={c} type="button" onClick={() => setCor(c)}
+                    className={`h-8 w-8 rounded-full transition-all ${cor === c ? 'ring-2 ring-offset-2 ring-primary-500 scale-110' : 'hover:scale-105'}`}
+                    style={{ backgroundColor: c }} />
                 ))}
               </div>
-              <input
-                type="color"
-                value={cor}
-                onChange={(e) => setCor(e.target.value)}
-                className="h-8 w-8 rounded cursor-pointer"
-              />
+              <input type="color" value={cor} onChange={(e) => setCor(e.target.value)} className="h-8 w-8 rounded cursor-pointer" />
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">

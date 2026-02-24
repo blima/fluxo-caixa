@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
@@ -11,6 +12,7 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -24,9 +26,9 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Sidebar />
-      <Topbar />
-      <main className="ml-64 pt-16 p-6">{children}</main>
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Topbar onMenuToggle={() => setSidebarOpen(true)} />
+      <main className="lg:ml-64 pt-14 lg:pt-16 p-4 lg:p-6">{children}</main>
     </div>
   );
 }

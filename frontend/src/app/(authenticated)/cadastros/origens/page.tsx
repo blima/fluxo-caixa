@@ -52,14 +52,15 @@ export default function OrigensPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Origens</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Origens</h1>
           <p className="text-sm text-gray-500">
             Gerencie as origens das receitas
           </p>
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <PlusIcon className="h-5 w-5" />
-          Nova Origem
+          <span className="hidden sm:inline">Nova Origem</span>
+          <span className="sm:hidden">Nova</span>
         </button>
       </div>
 
@@ -76,73 +77,66 @@ export default function OrigensPage() {
             }
           />
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Nome
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Descrição
-                </th>
-                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Padrão
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Mobile: cards */}
+            <div className="sm:hidden divide-y divide-gray-100">
               {items.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {item.nome}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {item.descricao || '-'}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    {item.padrao ? (
-                      <Badge variant="primary">Padrão</Badge>
-                    ) : null}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => setPadrao(item.id)}
-                        className="text-gray-400 hover:text-yellow-500 transition-colors"
-                        title="Definir como padrão"
-                      >
-                        {item.padrao ? (
-                          <StarSolidIcon className="h-5 w-5 text-yellow-500" />
-                        ) : (
-                          <StarIcon className="h-5 w-5" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => openEdit(item)}
-                        className="text-gray-400 hover:text-primary-600 transition-colors"
-                        title="Editar"
-                      >
-                        <PencilSquareIcon className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => remove(item.id)}
-                        className="text-gray-400 hover:text-red-600 transition-colors"
-                        title="Excluir"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                <div key={item.id} className="p-4 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      {item.nome}
+                      {item.padrao && <Badge variant="primary">Padrão</Badge>}
+                    </p>
+                    {item.descricao && <p className="text-xs text-gray-500 mt-0.5 truncate">{item.descricao}</p>}
+                  </div>
+                  <div className="flex items-center gap-3 ml-3">
+                    <button onClick={() => setPadrao(item.id)} className="text-gray-400 active:text-yellow-500">
+                      {item.padrao ? <StarSolidIcon className="h-5 w-5 text-yellow-500" /> : <StarIcon className="h-5 w-5" />}
+                    </button>
+                    <button onClick={() => openEdit(item)} className="text-gray-400 active:text-primary-600">
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => remove(item.id)} className="text-gray-400 active:text-red-600">
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+            {/* Desktop: table */}
+            <table className="w-full hidden sm:table">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Padrão</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nome}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.descricao || '-'}</td>
+                    <td className="px-6 py-4 text-center">{item.padrao ? <Badge variant="primary">Padrão</Badge> : null}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => setPadrao(item.id)} className="text-gray-400 hover:text-yellow-500 transition-colors" title="Definir como padrão">
+                          {item.padrao ? <StarSolidIcon className="h-5 w-5 text-yellow-500" /> : <StarIcon className="h-5 w-5" />}
+                        </button>
+                        <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors" title="Editar">
+                          <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
 

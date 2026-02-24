@@ -56,12 +56,13 @@ export default function TiposPagamentoPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tipos de Pagamento</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tipos de Pagamento</h1>
           <p className="text-sm text-gray-500">Gerencie as formas de pagamento</p>
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <PlusIcon className="h-5 w-5" />
-          Novo Tipo
+          <span className="hidden sm:inline">Novo Tipo</span>
+          <span className="sm:hidden">Novo</span>
         </button>
       </div>
 
@@ -73,41 +74,62 @@ export default function TiposPagamentoPage() {
             <button onClick={openCreate} className="btn-primary text-sm">Criar primeiro tipo</button>
           } />
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Modalidade</th>
-                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Parcelas</th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            <div className="sm:hidden divide-y divide-gray-100">
               {items.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nome}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{item.descricao || '-'}</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant={item.modalidade === 'a_vista' ? 'success' : 'warning'}>
-                      {item.modalidade === 'a_vista' ? 'À Vista' : 'A Prazo'}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm text-gray-700">{item.parcelas}x</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors" title="Editar">
-                        <PencilSquareIcon className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
+                <div key={item.id} className="p-4 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{item.nome}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant={item.modalidade === 'a_vista' ? 'success' : 'warning'}>
+                        {item.modalidade === 'a_vista' ? 'À Vista' : `${item.parcelas}x`}
+                      </Badge>
+                      {item.descricao && <span className="text-xs text-gray-500 truncate">{item.descricao}</span>}
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="flex items-center gap-3 ml-3">
+                    <button onClick={() => openEdit(item)} className="text-gray-400 active:text-primary-600">
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => remove(item.id)} className="text-gray-400 active:text-red-600">
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+            <table className="w-full hidden sm:table">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nome</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Modalidade</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Parcelas</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nome}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.descricao || '-'}</td>
+                    <td className="px-6 py-4 text-center">
+                      <Badge variant={item.modalidade === 'a_vista' ? 'success' : 'warning'}>
+                        {item.modalidade === 'a_vista' ? 'À Vista' : 'A Prazo'}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm text-gray-700">{item.parcelas}x</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors"><PencilSquareIcon className="h-5 w-5" /></button>
+                        <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors"><TrashIcon className="h-5 w-5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
 

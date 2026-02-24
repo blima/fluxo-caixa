@@ -130,7 +130,7 @@ export default function DespesasPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
             <ArrowTrendingDownIcon className="h-7 w-7 text-red-600" />
             Despesas
           </h1>
@@ -140,7 +140,7 @@ export default function DespesasPage() {
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <PlusIcon className="h-5 w-5" />
-          Nova Despesa
+          Nova<span className="hidden sm:inline">&nbsp;Despesa</span>
         </button>
       </div>
 
@@ -152,52 +152,82 @@ export default function DespesasPage() {
             <button onClick={openCreate} className="btn-primary text-sm">Criar primeira despesa</button>
           } />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Data</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Destino</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Etiqueta</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Pagamento</th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor</th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-700">{formatDate(item.data_evento)}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.descricao}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{item.destino?.nome || '-'}</td>
-                    <td className="px-6 py-4">
+          <>
+            {/* Mobile card layout */}
+            <div className="sm:hidden divide-y divide-gray-100">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
+                      <span className="text-sm font-semibold text-red-600 ml-2 whitespace-nowrap">{formatCurrency(parseFloat(String(item.valor)))}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="text-xs text-gray-500">{formatDate(item.data_evento)}</span>
+                      <span className="text-xs text-gray-400">{item.destino?.nome || '-'}</span>
                       {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{item.tipo_pagamento?.nome || '-'}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-red-600 text-right">{formatCurrency(parseFloat(String(item.valor)))}</td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
-                          <PencilSquareIcon className="h-5 w-5" />
-                        </button>
-                        <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </td>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-3">
+                    <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table layout */}
+            <div className="overflow-x-auto">
+              <table className="w-full hidden sm:table">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Data</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Destino</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Etiqueta</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Pagamento</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm text-gray-700">{formatDate(item.data_evento)}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.descricao}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{item.destino?.nome || '-'}</td>
+                      <td className="px-6 py-4">
+                        {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{item.tipo_pagamento?.nome || '-'}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-red-600 text-right">{formatCurrency(parseFloat(String(item.valor)))}</td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
+                            <PencilSquareIcon className="h-5 w-5" />
+                          </button>
+                          <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Despesa' : 'Nova Despesa'} size="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="col-span-1 sm:col-span-2">
               <label className="label-field">Descrição</label>
               <input type="text" className="input-field" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
             </div>
@@ -227,7 +257,7 @@ export default function DespesasPage() {
                 ))}
               </select>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="label-field">Tipo de Pagamento</label>
               <select className="input-field" value={tipoPagamentoId} onChange={(e) => setTipoPagamentoId(e.target.value)} required>
                 <option value="">Selecione...</option>
