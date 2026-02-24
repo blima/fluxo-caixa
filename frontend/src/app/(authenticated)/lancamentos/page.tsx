@@ -97,21 +97,19 @@ export default function LancamentosPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
+      <div className="flex items-center gap-2 sm:gap-3 mb-4">
         <div>
-          <label className="text-xs text-gray-500 block">Tipo</label>
           <select className="input-field text-sm" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value as any)}>
             <option value="">Todos</option>
             <option value="receita">Receitas</option>
             <option value="despesa">Despesas</option>
           </select>
         </div>
-        <div>
-          <label className="text-xs text-gray-500 block">De</label>
+        <div className="flex-1 sm:flex-none">
           <DateInput value={de} onChange={setDe} />
         </div>
-        <div>
-          <label className="text-xs text-gray-500 block">Até</label>
+        <span className="text-gray-300 text-sm">—</span>
+        <div className="flex-1 sm:flex-none">
           <DateInput value={ate} onChange={setAte} />
         </div>
       </div>

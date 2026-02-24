@@ -17,9 +17,6 @@ import {
   AreaChart,
   BarChart,
   DonutChart,
-  Card,
-  Title,
-  Text,
 } from '@tremor/react';
 import {
   BanknotesIcon,
@@ -97,29 +94,33 @@ export default function DashboardPage() {
       title: 'Total Receitas',
       value: resumo?.total_receitas ?? 0,
       icon: ArrowTrendingUpIcon,
-      color: 'text-green-600',
-      bg: 'bg-green-50',
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-100',
     },
     {
       title: 'Total Despesas',
       value: resumo?.total_despesas ?? 0,
       icon: ArrowTrendingDownIcon,
-      color: 'text-red-600',
-      bg: 'bg-red-50',
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      border: 'border-rose-100',
     },
     {
       title: 'Saldo',
       value: resumo?.saldo ?? 0,
       icon: ScaleIcon,
-      color: (resumo?.saldo ?? 0) >= 0 ? 'text-green-600' : 'text-red-600',
-      bg: (resumo?.saldo ?? 0) >= 0 ? 'bg-green-50' : 'bg-red-50',
+      color: (resumo?.saldo ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600',
+      bg: (resumo?.saldo ?? 0) >= 0 ? 'bg-emerald-50' : 'bg-rose-50',
+      border: (resumo?.saldo ?? 0) >= 0 ? 'border-emerald-100' : 'border-rose-100',
     },
     {
       title: 'Lançamentos',
       value: resumo?.total_lancamentos ?? 0,
       icon: BanknotesIcon,
-      color: 'text-primary-600',
-      bg: 'bg-primary-50',
+      color: 'text-violet-600',
+      bg: 'bg-violet-50',
+      border: 'border-violet-100',
       isCurrency: false,
     },
   ];
@@ -139,39 +140,44 @@ export default function DashboardPage() {
   }));
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
-        <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2">
+        <button onClick={() => setModalOpen(true)} className="btn-primary hidden sm:flex items-center gap-2">
           <PlusIcon className="h-5 w-5" />
-          <span className="hidden sm:inline">Novo Lançamento</span>
-          <span className="sm:hidden">Novo</span>
+          Novo Lançamento
         </button>
       </div>
-      <div className="flex items-end gap-2 sm:gap-3 mb-6">
+
+      {/* Filtros de período */}
+      <div className="flex items-center gap-2 sm:gap-3">
         <div className="flex-1 sm:flex-none sm:w-40">
-          <label className="text-xs text-gray-500 block">De</label>
           <DateInput value={de} onChange={setDe} />
         </div>
+        <span className="text-gray-300 text-sm">—</span>
         <div className="flex-1 sm:flex-none sm:w-40">
-          <label className="text-xs text-gray-500 block">Até</label>
           <DateInput value={ate} onChange={setAte} />
         </div>
+        <button onClick={() => setModalOpen(true)} className="btn-primary sm:hidden flex items-center gap-1 whitespace-nowrap">
+          <PlusIcon className="h-5 w-5" />
+          Novo
+        </button>
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {cards.map((card) => (
           <div
             key={card.title}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-5"
+            className={`bg-white rounded-2xl shadow-sm border ${card.border} p-3 sm:p-5 hover:shadow-md transition-shadow`}
           >
             <div className="flex items-center justify-between">
               <p className="text-xs sm:text-sm font-medium text-gray-500">{card.title}</p>
-              <div className={`p-1.5 sm:p-2 rounded-lg ${card.bg}`}>
+              <div className={`p-1.5 sm:p-2 rounded-xl ${card.bg}`}>
                 <card.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.color}`} />
               </div>
             </div>
@@ -185,116 +191,168 @@ export default function DashboardPage() {
       </div>
 
       {/* Card de Projeção */}
-      {projecao.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <CalendarDaysIcon className="h-5 w-5 text-primary-600" />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 rounded-xl bg-violet-50">
+            <CalendarDaysIcon className="h-5 w-5 text-violet-600" />
+          </div>
+          <div>
             <h2 className="text-base font-semibold text-gray-900">Projeção de Parcelas</h2>
+            <p className="text-xs text-gray-400">Lançamentos a prazo</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Receitas Bruto</p>
-              <p className="text-sm font-bold text-green-600">{formatCurrency(projecaoTotalReceitasBruto)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Receitas Líquido</p>
-              <p className="text-sm font-bold text-green-700">{formatCurrency(projecaoTotalReceitasLiquido)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Despesas Bruto</p>
-              <p className="text-sm font-bold text-red-600">{formatCurrency(projecaoTotalDespesasBruto)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Despesas Líquido</p>
-              <p className="text-sm font-bold text-red-700">{formatCurrency(projecaoTotalDespesasLiquido)}</p>
-            </div>
-          </div>
-          <BarChart
-            className="h-60"
-            data={projecaoChartData}
-            index="mes"
-            categories={['Receitas Bruto', 'Receitas Líquido', 'Despesas Bruto', 'Despesas Líquido']}
-            colors={['emerald', 'green', 'red', 'rose']}
-            valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={48}
-          />
         </div>
-      )}
+        {projecao.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+              <div className="bg-emerald-50/60 rounded-xl p-3 text-center">
+                <p className="text-[11px] text-gray-500 uppercase tracking-wide">Rec. Bruto</p>
+                <p className="text-sm font-bold text-emerald-600 mt-0.5">{formatCurrency(projecaoTotalReceitasBruto)}</p>
+              </div>
+              <div className="bg-emerald-50/60 rounded-xl p-3 text-center">
+                <p className="text-[11px] text-gray-500 uppercase tracking-wide">Rec. Líquido</p>
+                <p className="text-sm font-bold text-emerald-700 mt-0.5">{formatCurrency(projecaoTotalReceitasLiquido)}</p>
+              </div>
+              <div className="bg-rose-50/60 rounded-xl p-3 text-center">
+                <p className="text-[11px] text-gray-500 uppercase tracking-wide">Desp. Bruto</p>
+                <p className="text-sm font-bold text-rose-600 mt-0.5">{formatCurrency(projecaoTotalDespesasBruto)}</p>
+              </div>
+              <div className="bg-rose-50/60 rounded-xl p-3 text-center">
+                <p className="text-[11px] text-gray-500 uppercase tracking-wide">Desp. Líquido</p>
+                <p className="text-sm font-bold text-rose-700 mt-0.5">{formatCurrency(projecaoTotalDespesasLiquido)}</p>
+              </div>
+            </div>
+            <BarChart
+              className="h-64"
+              data={projecaoChartData}
+              index="mes"
+              categories={['Receitas Bruto', 'Receitas Líquido', 'Despesas Bruto', 'Despesas Líquido']}
+              colors={['emerald', 'teal', 'rose', 'pink']}
+              valueFormatter={(v) => formatCurrency(v)}
+              yAxisWidth={48}
+              showAnimation
+              showLegend
+            />
+          </>
+        ) : (
+          <div className="text-center py-10 text-gray-400">
+            <CalendarDaysIcon className="h-12 w-12 mx-auto mb-3 text-gray-200" />
+            <p className="text-sm font-medium text-gray-500">Nenhuma parcela futura</p>
+            <p className="text-xs mt-1">Lançamentos com pagamento &quot;a prazo&quot; aparecerão aqui</p>
+          </div>
+        )}
+      </div>
 
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card>
-          <Title>Receitas vs Despesas</Title>
-          <Text>Comparativo mensal</Text>
+      {/* Receitas vs Despesas + Saldo */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+            <div className="w-3 h-3 rounded-full bg-rose-500" />
+            <h3 className="text-sm font-semibold text-gray-900 ml-1">Receitas vs Despesas</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">Comparativo mensal</p>
           <BarChart
-            className="mt-4 h-72"
+            className="h-72"
             data={receitaDespesa}
             index="mes"
             categories={['receitas', 'despesas']}
-            colors={['emerald', 'red']}
+            colors={['emerald', 'rose']}
             valueFormatter={(v) => formatCurrency(v)}
             yAxisWidth={48}
+            showAnimation
+            showLegend={false}
           />
-        </Card>
+        </div>
 
-        <Card>
-          <Title>Saldo Acumulado</Title>
-          <Text>Evolução do saldo ao longo do tempo</Text>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <h3 className="text-sm font-semibold text-gray-900 ml-1">Saldo Acumulado</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">Evolução ao longo do tempo</p>
           <AreaChart
-            className="mt-4 h-60 sm:h-72"
+            className="h-72"
             data={saldo}
             index="data"
             categories={['saldo']}
             colors={['blue']}
             valueFormatter={(v) => formatCurrency(v)}
             yAxisWidth={48}
+            showAnimation
+            showLegend={false}
+            curveType="monotone"
           />
-        </Card>
+        </div>
       </div>
 
+      {/* Distribuições */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <Title>Por Etiqueta</Title>
-          <Text>Distribuição por categoria</Text>
-          <DonutChart
-            className="mt-4 h-52"
-            data={porEtiqueta.map((e) => ({ name: `${e.nome} (${e.tipo})`, value: e.valor }))}
-            category="value"
-            index="name"
-            valueFormatter={(v) => formatCurrency(v)}
-            colors={['blue', 'emerald', 'amber', 'red', 'violet', 'pink']}
-          />
-        </Card>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+          <h3 className="text-sm font-semibold text-gray-900 mb-1">Por Etiqueta</h3>
+          <p className="text-xs text-gray-400 mb-4">Distribuição por categoria</p>
+          {porEtiqueta.length > 0 ? (
+            <DonutChart
+              className="h-56"
+              data={porEtiqueta.map((e) => ({ name: `${e.nome} (${e.tipo})`, value: e.valor }))}
+              category="value"
+              index="name"
+              valueFormatter={(v) => formatCurrency(v)}
+              colors={['blue', 'emerald', 'amber', 'rose', 'violet', 'cyan', 'pink', 'indigo']}
+              showAnimation
+              variant="pie"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-56 text-sm text-gray-300">Sem dados</div>
+          )}
+        </div>
 
-        <Card>
-          <Title>Receitas por Origem</Title>
-          <Text>De onde vêm as receitas</Text>
-          <BarChart
-            className="mt-4 h-52"
-            data={porOrigem}
-            index="nome"
-            categories={['valor']}
-            colors={['emerald']}
-            valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={48}
-            layout="vertical"
-          />
-        </Card>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+            <h3 className="text-sm font-semibold text-gray-900 ml-1">Receitas por Origem</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">De onde vêm as receitas</p>
+          {porOrigem.length > 0 ? (
+            <BarChart
+              className="h-56"
+              data={porOrigem}
+              index="nome"
+              categories={['valor']}
+              colors={['emerald']}
+              valueFormatter={(v) => formatCurrency(v)}
+              yAxisWidth={48}
+              layout="vertical"
+              showAnimation
+              showLegend={false}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-56 text-sm text-gray-300">Sem dados</div>
+          )}
+        </div>
 
-        <Card>
-          <Title>Despesas por Destino</Title>
-          <Text>Para onde vão as despesas</Text>
-          <BarChart
-            className="mt-4 h-52"
-            data={porDestino}
-            index="nome"
-            categories={['valor']}
-            colors={['red']}
-            valueFormatter={(v) => formatCurrency(v)}
-            yAxisWidth={48}
-            layout="vertical"
-          />
-        </Card>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-3 h-3 rounded-full bg-rose-500" />
+            <h3 className="text-sm font-semibold text-gray-900 ml-1">Despesas por Destino</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">Para onde vão as despesas</p>
+          {porDestino.length > 0 ? (
+            <BarChart
+              className="h-56"
+              data={porDestino}
+              index="nome"
+              categories={['valor']}
+              colors={['rose']}
+              valueFormatter={(v) => formatCurrency(v)}
+              yAxisWidth={48}
+              layout="vertical"
+              showAnimation
+              showLegend={false}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-56 text-sm text-gray-300">Sem dados</div>
+          )}
+        </div>
       </div>
 
       <LancamentoModal

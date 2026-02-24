@@ -65,11 +65,10 @@ export default function ExtratoPage() {
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex-1 sm:flex-none">
-            <label className="text-xs text-gray-500 block">De</label>
             <DateInput value={de} onChange={setDe} />
           </div>
+          <span className="text-gray-300 text-sm">—</span>
           <div className="flex-1 sm:flex-none">
-            <label className="text-xs text-gray-500 block">Até</label>
             <DateInput value={ate} onChange={setAte} />
           </div>
         </div>
@@ -138,7 +137,12 @@ export default function ExtratoPage() {
                 <div key={item.id} className={`px-4 py-3 ${item.tipo === 'receita' ? 'bg-green-50/50' : 'bg-red-50/50'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${item.tipo === 'receita' ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <div className={`flex-shrink-0 p-1 rounded-lg ${item.tipo === 'receita' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+                        {item.tipo === 'receita'
+                          ? <ArrowTrendingUpIcon className="h-3.5 w-3.5 text-emerald-600" />
+                          : <ArrowTrendingDownIcon className="h-3.5 w-3.5 text-rose-600" />
+                        }
+                      </div>
                       <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
                     </div>
                     <span className={`text-sm font-semibold ml-2 whitespace-nowrap ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
@@ -161,7 +165,7 @@ export default function ExtratoPage() {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Data</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                    <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Tipo</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
                     <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor Bruto</th>
                     <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Taxa%</th>
@@ -173,10 +177,18 @@ export default function ExtratoPage() {
                   {itens.map((item) => (
                     <tr key={item.id} className={`border-b border-gray-100 ${item.tipo === 'receita' ? 'bg-green-50/40 hover:bg-green-50' : 'bg-red-50/40 hover:bg-red-50'}`}>
                       <td className="px-6 py-4 text-sm text-gray-700">{formatDate(item.data_evento)}</td>
-                      <td className="px-6 py-4">
-                        <Badge variant={item.tipo === 'receita' ? 'success' : 'danger'}>
-                          {item.tipo === 'receita' ? 'Receita' : 'Despesa'}
-                        </Badge>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <div className={`p-1.5 rounded-lg ${item.tipo === 'receita' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+                            {item.tipo === 'receita'
+                              ? <ArrowTrendingUpIcon className="h-4 w-4 text-emerald-600" />
+                              : <ArrowTrendingDownIcon className="h-4 w-4 text-rose-600" />
+                            }
+                          </div>
+                          <span className={`text-[10px] ${item.tipo === 'receita' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            {item.tipo === 'receita' ? 'Receita' : 'Despesa'}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.descricao}</td>
                       <td className="px-6 py-4 text-sm text-right text-gray-700">{formatCurrency(item.valor_bruto)}</td>
