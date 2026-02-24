@@ -88,13 +88,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-xs text-gray-400 text-center mt-6">
-            Controle financeiro simplificado
-          </p>
+          <div className="text-center mt-6">
+            <Footer />
+          </div>
         </div>
-      </div>
-      <div className="text-gray-300/70 mt-4">
-        <Footer />
       </div>
     </div>
   );
