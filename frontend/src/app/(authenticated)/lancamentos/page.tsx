@@ -108,7 +108,7 @@ export default function LancamentosPage() {
         <div className="flex-1 sm:flex-none">
           <DateInput value={de} onChange={setDe} />
         </div>
-        <span className="text-gray-300 text-sm">—</span>
+        <span className="text-gray-400 text-xs">até</span>
         <div className="flex-1 sm:flex-none">
           <DateInput value={ate} onChange={setAte} />
         </div>
