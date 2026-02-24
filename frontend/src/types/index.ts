@@ -48,6 +48,8 @@ export interface TipoPagamento {
   taxa: number;
   aplicavel_receita: boolean;
   aplicavel_despesa: boolean;
+  padrao_receita: boolean;
+  padrao_despesa: boolean;
   ativo: boolean;
   created_at: string;
   updated_at: string;

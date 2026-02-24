@@ -68,7 +68,10 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
         setDestinoId(destinoPadrao?.id || d.data[0]?.id || '');
         const etiquetaPadrao = e.data.find((et: Etiqueta) => et.padrao);
         setEtiquetaId(etiquetaPadrao?.id || e.data[0]?.id || '');
-        setTipoPagamentoId(tp.data[0]?.id || '');
+        const tpPadrao = tp.data.find((t: TipoPagamento) =>
+          defaultTipo === 'receita' ? t.padrao_receita : t.padrao_despesa
+        );
+        setTipoPagamentoId(tpPadrao?.id || tp.data[0]?.id || '');
       }
     };
     loadAux();
@@ -82,15 +85,18 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
     );
   }, [tiposPagamento, tipo]);
 
-  // Atualiza tipo_pagamento_id quando o filtro muda
+  // Atualiza tipo_pagamento_id quando o filtro muda (troca de receita/despesa)
   useEffect(() => {
     if (!editing && tiposPagamentoFiltrados.length > 0) {
       const currentExists = tiposPagamentoFiltrados.find((tp) => tp.id === tipoPagamentoId);
       if (!currentExists) {
-        setTipoPagamentoId(tiposPagamentoFiltrados[0].id);
+        const padrao = tiposPagamentoFiltrados.find((tp) =>
+          tipo === 'receita' ? tp.padrao_receita : tp.padrao_despesa
+        );
+        setTipoPagamentoId(padrao?.id || tiposPagamentoFiltrados[0].id);
       }
     }
-  }, [tiposPagamentoFiltrados, editing]);
+  }, [tiposPagamentoFiltrados, editing, tipo]);
 
   // Taxa do tipo de pagamento selecionado
   const tipoPagamentoSelecionado = tiposPagamento.find((t) => t.id === tipoPagamentoId);
@@ -221,7 +227,7 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
               <select className="input-field flex-1" value={tipoPagamentoId} onChange={(e) => setTipoPagamentoId(e.target.value)} required>
                 <option value="">Selecione...</option>
                 {tiposPagamentoFiltrados.map((tp) => (
-                  <option key={tp.id} value={tp.id}>{tp.nome}</option>
+                  <option key={tp.id} value={tp.id}>{tp.nome}{(tipo === 'receita' ? tp.padrao_receita : tp.padrao_despesa) ? ' (Padrão)' : ''}</option>
                 ))}
               </select>
               <div className="relative">

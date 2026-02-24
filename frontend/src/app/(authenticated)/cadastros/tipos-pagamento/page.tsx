@@ -8,7 +8,9 @@ import Modal from '@/components/ui/Modal';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
-import { PlusIcon, PencilSquareIcon, TrashIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilSquareIcon, TrashIcon, CreditCardIcon, StarIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
+import toast from 'react-hot-toast';
 
 export default function TiposPagamentoPage() {
   const {
@@ -21,6 +23,7 @@ export default function TiposPagamentoPage() {
     closeModal,
     save,
     remove,
+    reload,
   } = useCrud<TipoPagamento>(tiposPagamentoApi);
 
   const [nome, setNome] = useState('');
@@ -69,6 +72,16 @@ export default function TiposPagamentoPage() {
     });
   };
 
+  const handleSetPadrao = async (id: string, tipo: 'receita' | 'despesa') => {
+    try {
+      await tiposPagamentoApi.setPadrao(id, tipo);
+      toast.success(`Padrão para ${tipo === 'receita' ? 'receitas' : 'despesas'} definido!`);
+      reload();
+    } catch {
+      toast.error('Erro ao definir padrão');
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -112,6 +125,30 @@ export default function TiposPagamentoPage() {
                         {item.aplicavel_despesa && <Badge variant="danger">D</Badge>}
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <button
+                        onClick={() => handleSetPadrao(item.id, 'receita')}
+                        className="flex items-center gap-0.5 text-xs text-green-600"
+                        title="Definir como padrão para receitas"
+                      >
+                        {item.padrao_receita
+                          ? <StarSolidIcon className="h-3.5 w-3.5 text-green-500" />
+                          : <StarIcon className="h-3.5 w-3.5 text-gray-300" />
+                        }
+                        <span>Rec</span>
+                      </button>
+                      <button
+                        onClick={() => handleSetPadrao(item.id, 'despesa')}
+                        className="flex items-center gap-0.5 text-xs text-red-600"
+                        title="Definir como padrão para despesas"
+                      >
+                        {item.padrao_despesa
+                          ? <StarSolidIcon className="h-3.5 w-3.5 text-red-500" />
+                          : <StarIcon className="h-3.5 w-3.5 text-gray-300" />
+                        }
+                        <span>Desp</span>
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 ml-3">
                     <button onClick={() => openEdit(item)} className="text-gray-400 active:text-primary-600">
@@ -133,6 +170,7 @@ export default function TiposPagamentoPage() {
                   <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Parcelas</th>
                   <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Taxa</th>
                   <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Aplicável</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Padrão</th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
                 </tr>
               </thead>
@@ -154,6 +192,32 @@ export default function TiposPagamentoPage() {
                       <div className="flex items-center justify-center gap-1">
                         {item.aplicavel_receita && <Badge variant="success">Receita</Badge>}
                         {item.aplicavel_despesa && <Badge variant="danger">Despesa</Badge>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleSetPadrao(item.id, 'receita')}
+                          className="flex items-center gap-0.5 hover:opacity-80 transition-opacity"
+                          title="Definir como padrão para receitas"
+                        >
+                          {item.padrao_receita
+                            ? <StarSolidIcon className="h-4 w-4 text-green-500" />
+                            : <StarIcon className="h-4 w-4 text-gray-300 hover:text-green-400" />
+                          }
+                          <span className="text-xs text-green-600">R</span>
+                        </button>
+                        <button
+                          onClick={() => handleSetPadrao(item.id, 'despesa')}
+                          className="flex items-center gap-0.5 hover:opacity-80 transition-opacity"
+                          title="Definir como padrão para despesas"
+                        >
+                          {item.padrao_despesa
+                            ? <StarSolidIcon className="h-4 w-4 text-red-500" />
+                            : <StarIcon className="h-4 w-4 text-gray-300 hover:text-red-400" />
+                          }
+                          <span className="text-xs text-red-600">D</span>
+                        </button>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">

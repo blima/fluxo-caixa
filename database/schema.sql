@@ -92,6 +92,8 @@ CREATE TABLE tipos_pagamento (
     taxa DECIMAL(5,2) NOT NULL DEFAULT 0,
     aplicavel_receita BOOLEAN NOT NULL DEFAULT TRUE,
     aplicavel_despesa BOOLEAN NOT NULL DEFAULT TRUE,
+    padrao_receita BOOLEAN NOT NULL DEFAULT FALSE,
+    padrao_despesa BOOLEAN NOT NULL DEFAULT FALSE,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

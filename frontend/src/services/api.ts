@@ -84,6 +84,7 @@ export const tiposPagamentoApi = {
   create: (data: any) => api.post('/tipos-pagamento', data),
   update: (id: string, data: any) => api.patch(`/tipos-pagamento/${id}`, data),
   remove: (id: string) => api.delete(`/tipos-pagamento/${id}`),
+  setPadrao: (id: string, tipo: 'receita' | 'despesa') => api.patch(`/tipos-pagamento/${id}/set-padrao?tipo=${tipo}`),
 };
 
 // Lancamentos

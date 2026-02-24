@@ -8,7 +8,7 @@ interface CrudApi {
   create: (data: any) => Promise<any>;
   update: (id: string, data: any) => Promise<any>;
   remove: (id: string) => Promise<any>;
-  setPadrao?: (id: string) => Promise<any>;
+  setPadrao?: (id: string, ...args: any[]) => Promise<any>;
 }
 
 export function useCrud<T extends { id: string }>(api: CrudApi) {
