@@ -144,8 +144,8 @@ export default function DashboardPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2">
+        <div className="flex items-end gap-2 sm:gap-3">
+          <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2 h-[38px]">
             <PlusIcon className="h-5 w-5" />
             <span className="hidden sm:inline">Novo Lançamento</span>
             <span className="sm:hidden">Novo</span>

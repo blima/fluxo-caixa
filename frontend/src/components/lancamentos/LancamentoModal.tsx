@@ -6,6 +6,7 @@ import { Lancamento, Origem, Destino, Etiqueta, TipoPagamento } from '@/types';
 import Modal from '@/components/ui/Modal';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface LancamentoModalProps {
   open: boolean;
@@ -24,8 +25,8 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
   const [destinoId, setDestinoId] = useState('');
   const [etiquetaId, setEtiquetaId] = useState('');
   const [tipoPagamentoId, setTipoPagamentoId] = useState('');
-  const [taxa, setTaxa] = useState('0');
   const [submitting, setSubmitting] = useState(false);
+  const [showTaxaTooltip, setShowTaxaTooltip] = useState(false);
 
   const [origens, setOrigens] = useState<Origem[]>([]);
   const [destinos, setDestinos] = useState<Destino[]>([]);
@@ -55,7 +56,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
         setDestinoId(editing.destino_id || '');
         setEtiquetaId(editing.etiqueta_id);
         setTipoPagamentoId(editing.tipo_pagamento_id);
-        setTaxa(String(editing.taxa ?? 0));
       } else {
         setTipo(defaultTipo);
         setDescricao('');
@@ -68,10 +68,10 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
         const etiquetaPadrao = e.data.find((et: Etiqueta) => et.padrao);
         setEtiquetaId(etiquetaPadrao?.id || e.data[0]?.id || '');
         setTipoPagamentoId(tp.data[0]?.id || '');
-        setTaxa(String(tp.data[0]?.taxa ?? 0));
       }
     };
     loadAux();
+    setShowTaxaTooltip(false);
   }, [open, editing, defaultTipo]);
 
   // Filtra tipos de pagamento por aplicabilidade
@@ -87,22 +87,17 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
       const currentExists = tiposPagamentoFiltrados.find((tp) => tp.id === tipoPagamentoId);
       if (!currentExists) {
         setTipoPagamentoId(tiposPagamentoFiltrados[0].id);
-        setTaxa(String(tiposPagamentoFiltrados[0].taxa ?? 0));
       }
     }
   }, [tiposPagamentoFiltrados, editing]);
 
-  // Quando muda o tipo de pagamento, atualiza a taxa
-  const handleTipoPagamentoChange = (id: string) => {
-    setTipoPagamentoId(id);
-    const tp = tiposPagamento.find((t) => t.id === id);
-    if (tp) setTaxa(String(tp.taxa ?? 0));
-  };
+  // Taxa do tipo de pagamento selecionado
+  const tipoPagamentoSelecionado = tiposPagamento.find((t) => t.id === tipoPagamentoId);
+  const taxaAtual = tipoPagamentoSelecionado?.taxa ?? 0;
 
   // Cálculos em tempo real
   const valorNum = parseFloat(valor) || 0;
-  const taxaNum = parseFloat(taxa) || 0;
-  const valorTaxa = valorNum * taxaNum / 100;
+  const valorTaxa = valorNum * taxaAtual / 100;
   const valorLiquido = tipo === 'receita' ? valorNum - valorTaxa : valorNum + valorTaxa;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,7 +107,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
       tipo,
       descricao,
       valor: parseFloat(valor),
-      taxa: parseFloat(taxa),
       data_evento: dataEvento,
       etiqueta_id: etiquetaId,
       tipo_pagamento_id: tipoPagamentoId,
@@ -220,30 +214,49 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
             </select>
           </div>
 
-          <div>
+          <div className="col-span-1 sm:col-span-2">
             <label className="label-field">Tipo de Pagamento</label>
-            <select className="input-field" value={tipoPagamentoId} onChange={(e) => handleTipoPagamentoChange(e.target.value)} required>
-              <option value="">Selecione...</option>
-              {tiposPagamentoFiltrados.map((tp) => (
-                <option key={tp.id} value={tp.id}>{tp.nome}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="label-field">Taxa (%)</label>
-            <input type="number" step="0.01" min="0" max="100" className="input-field" value={taxa} onChange={(e) => setTaxa(e.target.value)} />
+            <div className="relative flex items-center gap-2">
+              <select className="input-field flex-1" value={tipoPagamentoId} onChange={(e) => setTipoPagamentoId(e.target.value)} required>
+                <option value="">Selecione...</option>
+                {tiposPagamentoFiltrados.map((tp) => (
+                  <option key={tp.id} value={tp.id}>{tp.nome}</option>
+                ))}
+              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowTaxaTooltip(!showTaxaTooltip)}
+                  onBlur={() => setTimeout(() => setShowTaxaTooltip(false), 200)}
+                  className="text-gray-400 hover:text-primary-600 transition-colors p-1"
+                  title="Ver taxa"
+                >
+                  <InformationCircleIcon className="h-5 w-5" />
+                </button>
+                {showTaxaTooltip && tipoPagamentoSelecionado && (
+                  <div className="absolute right-0 bottom-full mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10">
+                    <div className="font-semibold mb-1">{tipoPagamentoSelecionado.nome}</div>
+                    <div>Taxa: <span className="text-orange-300 font-medium">{taxaAtual}%</span></div>
+                    {tipoPagamentoSelecionado.modalidade === 'a_prazo' && (
+                      <div>Parcelas: {tipoPagamentoSelecionado.parcelas}x</div>
+                    )}
+                    <div className="absolute right-3 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Resumo bruto/líquido */}
-        {valorNum > 0 && taxaNum > 0 && (
+        {valorNum > 0 && taxaAtual > 0 && (
           <div className={`rounded-lg p-3 text-sm ${tipo === 'receita' ? 'bg-green-50' : 'bg-red-50'}`}>
             <div className="flex justify-between">
               <span className="text-gray-600">Valor Bruto:</span>
               <span className="font-medium">{formatCurrency(valorNum)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Taxa ({taxaNum}%):</span>
+              <span className="text-gray-600">Taxa ({taxaAtual}%):</span>
               <span className="font-medium text-orange-600">-{formatCurrency(valorTaxa)}</span>
             </div>
             <div className="flex justify-between border-t border-gray-200 mt-1 pt-1">
