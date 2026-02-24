@@ -5,6 +5,7 @@ import { extratoApi } from '@/services/api';
 import { ExtratoItem, ExtratoTotais } from '@/types';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
+import DateInput from '@/components/ui/DateInput';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -65,11 +66,11 @@ export default function ExtratoPage() {
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex-1 sm:flex-none">
             <label className="text-xs text-gray-500 block">De</label>
-            <input type="date" className="input-field text-sm" value={de} onChange={(e) => setDe(e.target.value)} />
+            <DateInput value={de} onChange={setDe} />
           </div>
           <div className="flex-1 sm:flex-none">
             <label className="text-xs text-gray-500 block">Até</label>
-            <input type="date" className="input-field text-sm" value={ate} onChange={(e) => setAte(e.target.value)} />
+            <DateInput value={ate} onChange={setAte} />
           </div>
         </div>
       </div>

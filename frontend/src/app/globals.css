@@ -19,10 +19,27 @@
     @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
   .input-field {
-    @apply w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-colors box-border appearance-none;
+    @apply w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-colors box-border;
     min-width: 0;
+  }
+  select.input-field {
+    @apply pr-8 bg-no-repeat;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-size: 1rem;
   }
   .label-field {
     @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+}
+
+/* Mobile: esconde o texto nativo do date input quando há overlay */
+@media (max-width: 639px) {
+  .date-input-custom {
+    color: transparent !important;
+  }
+  .date-input-custom::-webkit-datetime-edit {
+    color: transparent;
   }
 }

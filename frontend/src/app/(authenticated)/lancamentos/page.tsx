@@ -6,6 +6,7 @@ import { Lancamento } from '@/types';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
+import DateInput from '@/components/ui/DateInput';
 import LancamentoModal from '@/components/lancamentos/LancamentoModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -107,11 +108,11 @@ export default function LancamentosPage() {
         </div>
         <div>
           <label className="text-xs text-gray-500 block">De</label>
-          <input type="date" className="input-field text-sm" value={de} onChange={(e) => setDe(e.target.value)} />
+          <DateInput value={de} onChange={setDe} />
         </div>
         <div>
           <label className="text-xs text-gray-500 block">Até</label>
-          <input type="date" className="input-field text-sm" value={ate} onChange={(e) => setAte(e.target.value)} />
+          <DateInput value={ate} onChange={setAte} />
         </div>
       </div>
 

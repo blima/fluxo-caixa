@@ -7,6 +7,7 @@ import Modal from '@/components/ui/Modal';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import DateInput from '@/components/ui/DateInput';
 
 interface LancamentoModalProps {
   open: boolean;
@@ -178,7 +179,7 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
           </div>
           <div>
             <label className="label-field">Data do Evento</label>
-            <input type="date" className="input-field" value={dataEvento} onChange={(e) => setDataEvento(e.target.value)} required />
+            <DateInput value={dataEvento} onChange={setDataEvento} required />
           </div>
 
           {/* Origem (só receita) ou Destino (só despesa) */}
