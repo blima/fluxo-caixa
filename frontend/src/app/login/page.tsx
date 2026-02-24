@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { Squares2X2Icon } from '@heroicons/react/24/outline';
-
 export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -31,8 +29,21 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="flex flex-col items-center mb-8">
-            <div className="bg-primary-100 p-3 rounded-xl mb-4">
-              <Squares2X2Icon className="h-8 w-8 text-primary-600" />
+            <div className="bg-primary-50 p-4 rounded-2xl mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="h-16 w-16" fill="none">
+                {/* Moeda traseira */}
+                <ellipse cx="26" cy="32" rx="14" ry="14" className="fill-primary-200" />
+                <ellipse cx="26" cy="32" rx="10" ry="10" className="fill-primary-100" />
+                <text x="26" y="37" textAnchor="middle" className="fill-primary-700" fontSize="14" fontWeight="bold">$</text>
+                {/* Seta de fluxo */}
+                <path d="M38 22 L50 16 L48 24 Z" className="fill-primary-500" />
+                <path d="M32 28 Q40 20 50 16" className="stroke-primary-500" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                <path d="M38 42 L50 48 L48 40 Z" className="fill-primary-400" />
+                <path d="M32 36 Q40 44 50 48" className="stroke-primary-400" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                {/* Barras de gráfico */}
+                <rect x="52" y="28" width="4" height="16" rx="1" className="fill-primary-300" />
+                <rect x="58" y="22" width="4" height="22" rx="1" className="fill-primary-600" />
+              </svg>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
             <p className="text-sm text-gray-500 mt-1">
