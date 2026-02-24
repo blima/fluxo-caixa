@@ -8,7 +8,7 @@ import Modal from '@/components/ui/Modal';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
-import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilSquareIcon, TrashIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 
 export default function TiposPagamentoPage() {
   const {
@@ -73,7 +73,10 @@ export default function TiposPagamentoPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tipos de Pagamento</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <CreditCardIcon className="h-7 w-7 text-primary-600" />
+            Tipos de Pagamento
+          </h1>
           <p className="text-sm text-gray-500">Gerencie as formas de pagamento</p>
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">

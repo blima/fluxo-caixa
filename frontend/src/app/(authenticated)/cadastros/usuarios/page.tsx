@@ -11,6 +11,7 @@ import {
   PlusIcon,
   PencilSquareIcon,
   TrashIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 export default function UsuariosPage() {
@@ -56,7 +57,10 @@ export default function UsuariosPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Usuários</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <UsersIcon className="h-7 w-7 text-primary-600" />
+            Usuários
+          </h1>
           <p className="text-sm text-gray-500">
             Gerencie os usuários do sistema
           </p>

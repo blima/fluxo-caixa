@@ -13,6 +13,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   StarIcon,
+  MapPinIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
@@ -52,7 +53,10 @@ export default function OrigensPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Origens</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <MapPinIcon className="h-7 w-7 text-primary-600" />
+            Origens
+          </h1>
           <p className="text-sm text-gray-500">
             Gerencie as origens das receitas
           </p>
