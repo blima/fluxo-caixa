@@ -112,4 +112,12 @@ export const dashboardApi = {
     api.get('/dashboard/por-tipo-pagamento', { params }),
   saldo: (params?: Record<string, string>) =>
     api.get('/dashboard/saldo', { params }),
+  projecao: (params?: Record<string, string>) =>
+    api.get('/dashboard/projecao', { params }),
+};
+
+// Extrato
+export const extratoApi = {
+  list: (params?: Record<string, string>) =>
+    api.get('/extrato', { params }),
 };

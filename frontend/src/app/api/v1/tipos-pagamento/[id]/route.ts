@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const values: any[] = [];
     let idx = 1;
 
-    for (const key of ['nome', 'descricao', 'modalidade', 'parcelas']) {
+    for (const key of ['nome', 'descricao', 'modalidade', 'parcelas', 'taxa', 'aplicavel_receita', 'aplicavel_despesa']) {
       if (body[key] !== undefined) {
         fields.push(`${key} = $${idx++}`);
         values.push(body[key]);

@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   HomeIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
+  BanknotesIcon,
+  DocumentTextIcon,
   TagIcon,
   MapPinIcon,
   FlagIcon,
@@ -20,14 +20,9 @@ type NavGroup = { name: string; children: NavLink[] };
 type NavItem = NavLink | NavGroup;
 
 const navigation: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  {
-    name: 'Lançamentos',
-    children: [
-      { name: 'Receitas', href: '/lancamentos/receitas', icon: ArrowTrendingUpIcon },
-      { name: 'Despesas', href: '/lancamentos/despesas', icon: ArrowTrendingDownIcon },
-    ],
-  },
+  { name: 'Fluxo de Caixa', href: '/dashboard', icon: HomeIcon },
+  { name: 'Lançamentos', href: '/lancamentos', icon: BanknotesIcon },
+  { name: 'Extrato', href: '/extrato', icon: DocumentTextIcon },
   {
     name: 'Cadastros',
     children: [

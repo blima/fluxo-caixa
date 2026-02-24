@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
     const user = await getAuthUser(request);
     if (!user) return unauthorized();
 
-    const { nome, descricao, modalidade, parcelas } = await request.json();
+    const { nome, descricao, modalidade, parcelas, taxa, aplicavel_receita, aplicavel_despesa } = await request.json();
 
     const error = validateModalidade(modalidade, parcelas);
     if (error) return badRequest(error);
 
     const row = await queryOne(
-      'INSERT INTO tipos_pagamento (nome, descricao, modalidade, parcelas) VALUES ($1, $2, $3, $4) RETURNING *',
-      [nome, descricao || null, modalidade, parcelas],
+      'INSERT INTO tipos_pagamento (nome, descricao, modalidade, parcelas, taxa, aplicavel_receita, aplicavel_despesa) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [nome, descricao || null, modalidade, parcelas, taxa ?? 0, aplicavel_receita ?? true, aplicavel_despesa ?? true],
     );
     return NextResponse.json(row, { status: 201 });
   } catch (error: any) {

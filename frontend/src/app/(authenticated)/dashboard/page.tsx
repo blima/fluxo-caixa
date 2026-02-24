@@ -7,9 +7,11 @@ import {
   ReceitaDespesaMensal,
   DadosPorCategoria,
   SaldoDiario,
+  ProjecaoMensal,
 } from '@/types';
 import { formatCurrency, formatMesAno } from '@/lib/utils';
 import Loading from '@/components/ui/Loading';
+import LancamentoModal from '@/components/lancamentos/LancamentoModal';
 import {
   AreaChart,
   BarChart,
@@ -17,15 +19,14 @@ import {
   Card,
   Title,
   Text,
-  Flex,
-  Metric,
-  BadgeDelta,
 } from '@tremor/react';
 import {
   BanknotesIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   ScaleIcon,
+  PlusIcon,
+  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 
 export default function DashboardPage() {
@@ -36,6 +37,8 @@ export default function DashboardPage() {
   const [porOrigem, setPorOrigem] = useState<DadosPorCategoria[]>([]);
   const [porDestino, setPorDestino] = useState<DadosPorCategoria[]>([]);
   const [saldo, setSaldo] = useState<SaldoDiario[]>([]);
+  const [projecao, setProjecao] = useState<ProjecaoMensal[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [de, setDe] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
@@ -53,13 +56,14 @@ export default function DashboardPage() {
       if (de) params.de = de;
       if (ate) params.ate = ate;
 
-      const [r, rd, pe, po, pd, s] = await Promise.all([
+      const [r, rd, pe, po, pd, s, proj] = await Promise.all([
         dashboardApi.resumo(params),
         dashboardApi.receitaDespesa(params),
         dashboardApi.porEtiqueta(params),
         dashboardApi.porOrigem(params),
         dashboardApi.porDestino(params),
         dashboardApi.saldo(params),
+        dashboardApi.projecao({ meses: '6' }),
       ]);
 
       setResumo(r.data);
@@ -73,6 +77,7 @@ export default function DashboardPage() {
       setPorOrigem(po.data);
       setPorDestino(pd.data);
       setSaldo(s.data);
+      setProjecao(proj.data);
     } catch {
       // silently fail
     } finally {
@@ -118,17 +123,33 @@ export default function DashboardPage() {
     },
   ];
 
-  const etiquetaReceitas = porEtiqueta.filter((e) => e.tipo === 'receita');
-  const etiquetaDespesas = porEtiqueta.filter((e) => e.tipo === 'despesa');
+  // Projeção totais
+  const projecaoTotalReceitasBruto = projecao.reduce((s, p) => s + p.receitas_bruto, 0);
+  const projecaoTotalReceitasLiquido = projecao.reduce((s, p) => s + p.receitas_liquido, 0);
+  const projecaoTotalDespesasBruto = projecao.reduce((s, p) => s + p.despesas_bruto, 0);
+  const projecaoTotalDespesasLiquido = projecao.reduce((s, p) => s + p.despesas_liquido, 0);
+
+  const projecaoChartData = projecao.map((p) => ({
+    mes: formatMesAno(p.mes),
+    'Receitas Bruto': p.receitas_bruto,
+    'Receitas Líquido': p.receitas_liquido,
+    'Despesas Bruto': p.despesas_bruto,
+    'Despesas Líquido': p.despesas_liquido,
+  }));
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
           <p className="text-sm text-gray-500">Visão geral do fluxo de caixa</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
+          <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2">
+            <PlusIcon className="h-5 w-5" />
+            <span className="hidden sm:inline">Novo Lançamento</span>
+            <span className="sm:hidden">Novo</span>
+          </button>
           <div className="flex-1 sm:flex-none">
             <label className="text-xs text-gray-500 block">De</label>
             <input
@@ -172,9 +193,45 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* Card de Projeção */}
+      {projecao.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDaysIcon className="h-5 w-5 text-primary-600" />
+            <h2 className="text-base font-semibold text-gray-900">Projeção de Parcelas</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div className="text-center">
+              <p className="text-xs text-gray-500">Receitas Bruto</p>
+              <p className="text-sm font-bold text-green-600">{formatCurrency(projecaoTotalReceitasBruto)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500">Receitas Líquido</p>
+              <p className="text-sm font-bold text-green-700">{formatCurrency(projecaoTotalReceitasLiquido)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500">Despesas Bruto</p>
+              <p className="text-sm font-bold text-red-600">{formatCurrency(projecaoTotalDespesasBruto)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500">Despesas Líquido</p>
+              <p className="text-sm font-bold text-red-700">{formatCurrency(projecaoTotalDespesasLiquido)}</p>
+            </div>
+          </div>
+          <BarChart
+            className="h-60"
+            data={projecaoChartData}
+            index="mes"
+            categories={['Receitas Bruto', 'Receitas Líquido', 'Despesas Bruto', 'Despesas Líquido']}
+            colors={['emerald', 'green', 'red', 'rose']}
+            valueFormatter={(v) => formatCurrency(v)}
+            yAxisWidth={48}
+          />
+        </div>
+      )}
+
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Receitas vs Despesas por Mês */}
         <Card>
           <Title>Receitas vs Despesas</Title>
           <Text>Comparativo mensal</Text>
@@ -189,7 +246,6 @@ export default function DashboardPage() {
           />
         </Card>
 
-        {/* Saldo Acumulado */}
         <Card>
           <Title>Saldo Acumulado</Title>
           <Text>Evolução do saldo ao longo do tempo</Text>
@@ -206,7 +262,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Por Etiqueta */}
         <Card>
           <Title>Por Etiqueta</Title>
           <Text>Distribuição por categoria</Text>
@@ -220,7 +275,6 @@ export default function DashboardPage() {
           />
         </Card>
 
-        {/* Receitas por Origem */}
         <Card>
           <Title>Receitas por Origem</Title>
           <Text>De onde vêm as receitas</Text>
@@ -236,7 +290,6 @@ export default function DashboardPage() {
           />
         </Card>
 
-        {/* Despesas por Destino */}
         <Card>
           <Title>Despesas por Destino</Title>
           <Text>Para onde vão as despesas</Text>
@@ -252,6 +305,13 @@ export default function DashboardPage() {
           />
         </Card>
       </div>
+
+      <LancamentoModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        editing={null}
+        onSaved={load}
+      />
     </div>
   );
 }

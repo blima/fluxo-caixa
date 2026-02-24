@@ -27,6 +27,9 @@ export default function TiposPagamentoPage() {
   const [descricao, setDescricao] = useState('');
   const [modalidade, setModalidade] = useState<'a_vista' | 'a_prazo'>('a_vista');
   const [parcelas, setParcelas] = useState(1);
+  const [taxa, setTaxa] = useState('0');
+  const [aplicavelReceita, setAplicavelReceita] = useState(true);
+  const [aplicavelDespesa, setAplicavelDespesa] = useState(true);
 
   useEffect(() => {
     if (editing) {
@@ -34,11 +37,17 @@ export default function TiposPagamentoPage() {
       setDescricao(editing.descricao || '');
       setModalidade(editing.modalidade);
       setParcelas(editing.parcelas);
+      setTaxa(String(editing.taxa ?? 0));
+      setAplicavelReceita(editing.aplicavel_receita ?? true);
+      setAplicavelDespesa(editing.aplicavel_despesa ?? true);
     } else {
       setNome('');
       setDescricao('');
       setModalidade('a_vista');
       setParcelas(1);
+      setTaxa('0');
+      setAplicavelReceita(true);
+      setAplicavelDespesa(true);
     }
   }, [editing, modalOpen]);
 
@@ -49,7 +58,15 @@ export default function TiposPagamentoPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    save({ nome, descricao: descricao || null, modalidade, parcelas });
+    save({
+      nome,
+      descricao: descricao || null,
+      modalidade,
+      parcelas,
+      taxa: parseFloat(taxa) || 0,
+      aplicavel_receita: aplicavelReceita,
+      aplicavel_despesa: aplicavelDespesa,
+    });
   };
 
   return (
@@ -80,11 +97,17 @@ export default function TiposPagamentoPage() {
                 <div key={item.id} className="p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900">{item.nome}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <Badge variant={item.modalidade === 'a_vista' ? 'success' : 'warning'}>
                         {item.modalidade === 'a_vista' ? 'À Vista' : `${item.parcelas}x`}
                       </Badge>
-                      {item.descricao && <span className="text-xs text-gray-500 truncate">{item.descricao}</span>}
+                      {(item.taxa ?? 0) > 0 && (
+                        <span className="text-xs text-orange-600 font-medium">{item.taxa}%</span>
+                      )}
+                      <div className="flex gap-1">
+                        {item.aplicavel_receita && <Badge variant="success">R</Badge>}
+                        {item.aplicavel_despesa && <Badge variant="danger">D</Badge>}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 ml-3">
@@ -105,6 +128,8 @@ export default function TiposPagamentoPage() {
                   <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Descrição</th>
                   <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Modalidade</th>
                   <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Parcelas</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Taxa</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Aplicável</th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Ações</th>
                 </tr>
               </thead>
@@ -119,6 +144,15 @@ export default function TiposPagamentoPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-gray-700">{item.parcelas}x</td>
+                    <td className="px-6 py-4 text-center text-sm text-gray-700">
+                      {(item.taxa ?? 0) > 0 ? <span className="text-orange-600 font-medium">{item.taxa}%</span> : '-'}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        {item.aplicavel_receita && <Badge variant="success">Receita</Badge>}
+                        {item.aplicavel_despesa && <Badge variant="danger">Despesa</Badge>}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors"><PencilSquareIcon className="h-5 w-5" /></button>
@@ -162,6 +196,23 @@ export default function TiposPagamentoPage() {
               <input type="number" className="input-field" min={2} max={48} value={parcelas} onChange={(e) => setParcelas(parseInt(e.target.value) || 2)} />
             </div>
           )}
+          <div>
+            <label className="label-field">Taxa (%)</label>
+            <input type="number" step="0.01" min="0" max="100" className="input-field" value={taxa} onChange={(e) => setTaxa(e.target.value)} />
+          </div>
+          <div>
+            <label className="label-field">Aplicável a</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={aplicavelReceita} onChange={(e) => setAplicavelReceita(e.target.checked)} className="text-green-600 rounded" />
+                <span className="text-sm text-green-700">Receita</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={aplicavelDespesa} onChange={(e) => setAplicavelDespesa(e.target.checked)} className="text-red-600 rounded" />
+                <span className="text-sm text-red-700">Despesa</span>
+              </label>
+            </div>
+          </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={closeModal} className="btn-secondary">Cancelar</button>
             <button type="submit" className="btn-primary">{editing ? 'Salvar' : 'Criar'}</button>

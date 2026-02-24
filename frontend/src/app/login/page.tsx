@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import Footer from '@/components/layout/Footer';
 import toast from 'react-hot-toast';
 export default function LoginPage() {
   const { login } = useAuth();
@@ -25,7 +26,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-900 via-primary-800 to-primary-600">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-900 via-primary-800 to-primary-600">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="flex flex-col items-center mb-8">
@@ -91,6 +92,9 @@ export default function LoginPage() {
             Controle financeiro simplificado
           </p>
         </div>
+      </div>
+      <div className="text-gray-300/70 mt-4">
+        <Footer />
       </div>
     </div>
   );

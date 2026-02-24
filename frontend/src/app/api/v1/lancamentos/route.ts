@@ -77,11 +77,18 @@ export async function POST(request: NextRequest) {
       return badRequest('Despesa deve ter um destino');
     }
 
+    // Buscar taxa do tipo de pagamento se não foi enviada
+    let taxa = body.taxa;
+    if (taxa === undefined || taxa === null) {
+      const tp = await queryOne<any>('SELECT taxa FROM tipos_pagamento WHERE id = $1', [tipo_pagamento_id]);
+      taxa = tp?.taxa ?? 0;
+    }
+
     const inserted = await queryOne<any>(
-      `INSERT INTO lancamentos (tipo, descricao, valor, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id, usuario_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO lancamentos (tipo, descricao, valor, taxa, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id, usuario_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
-      [tipo, descricao, valor, data_evento, origem_id || null, destino_id || null, etiqueta_id, tipo_pagamento_id, user.id],
+      [tipo, descricao, valor, taxa, data_evento, origem_id || null, destino_id || null, etiqueta_id, tipo_pagamento_id, user.id],
     );
 
     const row = await queryOne(

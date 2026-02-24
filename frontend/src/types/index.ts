@@ -44,6 +44,9 @@ export interface TipoPagamento {
   descricao: string | null;
   modalidade: 'a_vista' | 'a_prazo';
   parcelas: number;
+  taxa: number;
+  aplicavel_receita: boolean;
+  aplicavel_despesa: boolean;
   ativo: boolean;
   created_at: string;
   updated_at: string;
@@ -54,6 +57,7 @@ export interface Lancamento {
   tipo: 'receita' | 'despesa';
   descricao: string;
   valor: number;
+  taxa: number;
   data_lancamento: string;
   data_evento: string;
   origem_id: string | null;
@@ -94,4 +98,41 @@ export interface DadosPorCategoria {
 export interface SaldoDiario {
   data: string;
   saldo: number;
+}
+
+export interface ProjecaoMensal {
+  mes: string;
+  receitas_bruto: number;
+  receitas_liquido: number;
+  despesas_bruto: number;
+  despesas_liquido: number;
+}
+
+export interface ExtratoTotais {
+  receitas_bruto: number;
+  receitas_taxa: number;
+  receitas_liquido: number;
+  despesas_bruto: number;
+  despesas_taxa: number;
+  despesas_liquido: number;
+}
+
+export interface ExtratoItem {
+  id: string;
+  tipo: 'receita' | 'despesa';
+  descricao: string;
+  data_evento: string;
+  valor_bruto: number;
+  taxa: number;
+  valor_taxa: number;
+  valor_liquido: number;
+  origem: Origem | null;
+  destino: Destino | null;
+  etiqueta: Etiqueta;
+  tipo_pagamento: TipoPagamento;
+}
+
+export interface ExtratoResponse {
+  itens: ExtratoItem[];
+  totais: ExtratoTotais;
 }
