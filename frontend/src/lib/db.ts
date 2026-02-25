@@ -1,4 +1,8 @@
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
+
+// Forçar DATE (OID 1082) a retornar como string pura (YYYY-MM-DD)
+// sem conversão para Date JS que causa distorção de timezone
+types.setTypeParser(1082, (val: string) => val);
 
 declare global {
   // eslint-disable-next-line no-var
