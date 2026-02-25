@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLoja } from '@/contexts/LojaContext';
 import {
   HomeIcon,
   BanknotesIcon,
@@ -44,6 +45,7 @@ interface SidebarProps {
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { lojas, lojaId, setLojaId } = useLoja();
 
   return (
     <>
@@ -69,6 +71,25 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
+
+        {/* Seletor de Loja */}
+        {lojas.length > 0 && (
+          <div className="px-3 py-3 border-b border-primary-800">
+            <div className="flex items-center gap-2 px-1 mb-1.5">
+              <BuildingStorefrontIcon className="h-4 w-4 text-primary-400" />
+              <span className="text-[11px] font-semibold text-primary-400 uppercase tracking-wider">Loja</span>
+            </div>
+            <select
+              value={lojaId}
+              onChange={(e) => setLojaId(e.target.value)}
+              className="w-full bg-primary-800 text-white text-sm rounded-lg px-3 py-2 border border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
+            >
+              {lojas.map((l) => (
+                <option key={l.id} value={l.id}>{l.nome}{l.matriz ? ' (Matriz)' : ''}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <nav className="flex-1 overflow-y-auto py-4 px-3">
           {navigation.map((item) => {

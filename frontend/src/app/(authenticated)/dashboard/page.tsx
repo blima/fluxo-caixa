@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { dashboardApi, lojasApi } from '@/services/api';
+import { dashboardApi } from '@/services/api';
+import { useLoja } from '@/contexts/LojaContext';
 import {
   DashboardResumo,
   ReceitaDespesaMensal,
   DadosPorCategoria,
   SaldoDiario,
   ProjecaoMensal,
-  Loja,
 } from '@/types';
 import { formatCurrency, formatMesAno } from '@/lib/utils';
 import Loading from '@/components/ui/Loading';
@@ -39,8 +39,7 @@ export default function DashboardPage() {
   const [porDestino, setPorDestino] = useState<DadosPorCategoria[]>([]);
   const [saldo, setSaldo] = useState<SaldoDiario[]>([]);
   const [projecao, setProjecao] = useState<ProjecaoMensal[]>([]);
-  const [lojas, setLojas] = useState<Loja[]>([]);
-  const [lojaId, setLojaId] = useState('');
+  const { lojaId } = useLoja();
   const [modalOpen, setModalOpen] = useState(false);
   const [de, setDe] = useState(() => {
     const now = new Date();
@@ -51,17 +50,6 @@ export default function DashboardPage() {
     const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return `${last.getFullYear()}-${String(last.getMonth() + 1).padStart(2, '0')}-${String(last.getDate()).padStart(2, '0')}`;
   });
-
-  // Carrega lojas uma vez
-  useEffect(() => {
-    lojasApi.list().then((res) => {
-      const ativas = (res.data as Loja[]).filter((l: Loja) => l.ativo);
-      setLojas(ativas);
-      const matriz = ativas.find((l: Loja) => l.matriz);
-      if (matriz) setLojaId(matriz.id);
-      else if (ativas.length > 0) setLojaId(ativas[0].id);
-    });
-  }, []);
 
   const load = async () => {
     if (!lojaId) return;
@@ -375,15 +363,8 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* Filtros de período + loja + botão mobile */}
+      {/* Filtros de período + botão mobile */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-        <div className="sm:flex-none">
-          <select className="input-field text-sm" value={lojaId} onChange={(e) => setLojaId(e.target.value)}>
-            {lojas.map((l) => (
-              <option key={l.id} value={l.id}>{l.nome}{l.matriz ? ' (Matriz)' : ''}</option>
-            ))}
-          </select>
-        </div>
         <div className="flex items-center gap-2 flex-1 sm:flex-none">
           <div className="flex-1 sm:flex-none sm:w-40">
             <DateInput value={de} onChange={setDe} />

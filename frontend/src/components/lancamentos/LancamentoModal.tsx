@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { origensApi, destinosApi, etiquetasApi, tiposPagamentoApi, lancamentosApi, lojasApi } from '@/services/api';
-import { Lancamento, Origem, Destino, Etiqueta, TipoPagamento, Loja } from '@/types';
+import { origensApi, destinosApi, etiquetasApi, tiposPagamentoApi, lancamentosApi } from '@/services/api';
+import { useLoja } from '@/contexts/LojaContext';
+import { Lancamento, Origem, Destino, Etiqueta, TipoPagamento } from '@/types';
 import Modal from '@/components/ui/Modal';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ interface LancamentoModalProps {
 }
 
 export default function LancamentoModal({ open, onClose, editing, onSaved, defaultTipo = 'receita' }: LancamentoModalProps) {
+  const { lojaId } = useLoja();
   const [tipo, setTipo] = useState<'receita' | 'despesa'>(defaultTipo);
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
@@ -26,7 +28,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
   const [destinoId, setDestinoId] = useState('');
   const [etiquetaId, setEtiquetaId] = useState('');
   const [tipoPagamentoId, setTipoPagamentoId] = useState('');
-  const [lojaId, setLojaId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showTaxaTooltip, setShowTaxaTooltip] = useState(false);
 
@@ -34,24 +35,20 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
   const [destinos, setDestinos] = useState<Destino[]>([]);
   const [etiquetas, setEtiquetas] = useState<Etiqueta[]>([]);
   const [tiposPagamento, setTiposPagamento] = useState<TipoPagamento[]>([]);
-  const [lojas, setLojas] = useState<Loja[]>([]);
 
   useEffect(() => {
     if (!open) return;
     const loadAux = async () => {
-      const [o, d, e, tp, lo] = await Promise.all([
+      const [o, d, e, tp] = await Promise.all([
         origensApi.list(),
         destinosApi.list(),
         etiquetasApi.list(),
         tiposPagamentoApi.list(),
-        lojasApi.list(),
       ]);
       setOrigens(o.data);
       setDestinos(d.data);
       setEtiquetas(e.data);
       setTiposPagamento(tp.data);
-      const lojasAtivas = (lo.data as Loja[]).filter((l: Loja) => l.ativo);
-      setLojas(lojasAtivas);
 
       if (editing) {
         setTipo(editing.tipo);
@@ -62,7 +59,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
         setDestinoId(editing.destino_id || '');
         setEtiquetaId(editing.etiqueta_id);
         setTipoPagamentoId(editing.tipo_pagamento_id);
-        setLojaId(editing.loja_id || '');
       } else {
         setTipo(defaultTipo);
         setDescricao('');
@@ -78,8 +74,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
           defaultTipo === 'receita' ? t.padrao_receita : t.padrao_despesa
         );
         setTipoPagamentoId(tpPadrao?.id || tp.data[0]?.id || '');
-        // Loja: não pré-selecionar, forçar o usuário a escolher
-        if (!lojaId) setLojaId('');
       }
     };
     loadAux();
@@ -183,17 +177,6 @@ export default function LancamentoModal({ open, onClose, editing, onSaved, defau
               Despesa
             </button>
           </div>
-        </div>
-
-        {/* Loja */}
-        <div>
-          <label className="label-field">Loja</label>
-          <select className="input-field" value={lojaId} onChange={(e) => setLojaId(e.target.value)} required>
-            <option value="">Selecione a loja</option>
-            {lojas.map((l) => (
-              <option key={l.id} value={l.id}>{l.nome}{l.matriz ? ' (Matriz)' : ''}</option>
-            ))}
-          </select>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

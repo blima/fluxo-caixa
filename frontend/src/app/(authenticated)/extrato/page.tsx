@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { extratoApi, lojasApi } from '@/services/api';
-import { ExtratoItem, ExtratoTotais, Loja } from '@/types';
+import { extratoApi } from '@/services/api';
+import { useLoja } from '@/contexts/LojaContext';
+import { ExtratoItem, ExtratoTotais } from '@/types';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import DateInput from '@/components/ui/DateInput';
@@ -20,8 +21,7 @@ export default function ExtratoPage() {
   const [itens, setItens] = useState<ExtratoItem[]>([]);
   const [totais, setTotais] = useState<ExtratoTotais | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lojas, setLojas] = useState<Loja[]>([]);
-  const [lojaId, setLojaId] = useState('');
+  const { lojaId } = useLoja();
   const [de, setDe] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
@@ -31,16 +31,6 @@ export default function ExtratoPage() {
     const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     return `${last.getFullYear()}-${String(last.getMonth() + 1).padStart(2, '0')}-${String(last.getDate()).padStart(2, '0')}`;
   });
-
-  useEffect(() => {
-    lojasApi.list().then((res) => {
-      const ativas = (res.data as Loja[]).filter((l: Loja) => l.ativo);
-      setLojas(ativas);
-      const matriz = ativas.find((l: Loja) => l.matriz);
-      if (matriz) setLojaId(matriz.id);
-      else if (ativas.length > 0) setLojaId(ativas[0].id);
-    });
-  }, []);
 
   const load = async () => {
     if (!lojaId) return;
@@ -77,22 +67,13 @@ export default function ExtratoPage() {
           </h1>
           <p className="text-sm text-gray-500">Visão detalhada com valores bruto e líquido</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-          <div>
-            <select className="input-field text-sm" value={lojaId} onChange={(e) => setLojaId(e.target.value)}>
-              {lojas.map((l) => (
-                <option key={l.id} value={l.id}>{l.nome}{l.matriz ? ' (Matriz)' : ''}</option>
-              ))}
-            </select>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex-1 sm:flex-none">
+            <DateInput value={de} onChange={setDe} />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 sm:flex-none">
-              <DateInput value={de} onChange={setDe} />
-            </div>
-            <span className="text-gray-400 text-xs">até</span>
-            <div className="flex-1 sm:flex-none">
-              <DateInput value={ate} onChange={setAte} />
-            </div>
+          <span className="text-gray-400 text-xs">até</span>
+          <div className="flex-1 sm:flex-none">
+            <DateInput value={ate} onChange={setAte} />
           </div>
         </div>
       </div>
