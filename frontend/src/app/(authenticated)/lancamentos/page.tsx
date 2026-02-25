@@ -9,13 +9,14 @@ import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
 import DateInput from '@/components/ui/DateInput';
 import LancamentoModal from '@/components/lancamentos/LancamentoModal';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import {
   PlusIcon,
   PencilSquareIcon,
   TrashIcon,
   BanknotesIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 
 export default function LancamentosPage() {
@@ -24,6 +25,7 @@ export default function LancamentosPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Lancamento | null>(null);
   const [filtroTipo, setFiltroTipo] = useState<'' | 'receita' | 'despesa'>('');
+  const [infoId, setInfoId] = useState<string | null>(null);
   const { lojaId } = useLoja();
   const [de, setDe] = useState(() => {
     const now = new Date();
@@ -101,7 +103,7 @@ export default function LancamentosPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
         <div>
           <select className="input-field text-sm" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value as any)}>
             <option value="">Todos</option>
@@ -109,12 +111,14 @@ export default function LancamentosPage() {
             <option value="despesa">Despesas</option>
           </select>
         </div>
-        <div className="flex-1 sm:flex-none">
-          <DateInput value={de} onChange={setDe} />
-        </div>
-        <span className="text-gray-400 text-xs">até</span>
-        <div className="flex-1 sm:flex-none">
-          <DateInput value={ate} onChange={setAte} />
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex-1 min-w-0 sm:flex-none sm:w-40">
+            <DateInput value={de} onChange={setDe} />
+          </div>
+          <span className="text-gray-400 text-xs flex-shrink-0">até</span>
+          <div className="flex-1 min-w-0 sm:flex-none sm:w-40">
+            <DateInput value={ate} onChange={setAte} />
+          </div>
         </div>
       </div>
 
@@ -130,36 +134,46 @@ export default function LancamentosPage() {
             {/* Mobile card layout */}
             <div className="sm:hidden divide-y divide-gray-100">
               {items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between px-4 py-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${item.tipo === 'receita' ? 'bg-green-500' : 'bg-red-500'}`} />
-                        <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
+                <div key={item.id}>
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${item.tipo === 'receita' ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
+                        </div>
+                        <span className={`text-sm font-semibold ml-2 whitespace-nowrap ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(parseFloat(String(item.valor)))}
+                        </span>
                       </div>
-                      <span className={`text-sm font-semibold ml-2 whitespace-nowrap ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(parseFloat(String(item.valor)))}
-                      </span>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-xs text-gray-500">{formatDate(item.data_evento)}</span>
+                        <span className="text-xs text-gray-400">
+                          {item.tipo === 'receita' ? item.origem?.nome : item.destino?.nome || '-'}
+                        </span>
+                        {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
+                        {parseFloat(String(item.taxa)) > 0 && (
+                          <span className="text-xs text-orange-500">{item.taxa}%</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-xs text-gray-500">{formatDate(item.data_evento)}</span>
-                      <span className="text-xs text-gray-400">
-                        {item.tipo === 'receita' ? item.origem?.nome : item.destino?.nome || '-'}
-                      </span>
-                      {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
-                      {parseFloat(String(item.taxa)) > 0 && (
-                        <span className="text-xs text-orange-500">{item.taxa}%</span>
-                      )}
+                    <div className="flex items-center gap-2 ml-3">
+                      <button onClick={() => setInfoId(infoId === item.id ? null : item.id)} className="text-gray-400 hover:text-blue-600 transition-colors">
+                        <InformationCircleIcon className="h-5 w-5" />
+                      </button>
+                      <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
+                        <PencilSquareIcon className="h-5 w-5" />
+                      </button>
+                      <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-3">
-                    <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
-                      <PencilSquareIcon className="h-5 w-5" />
-                    </button>
-                    <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </div>
+                  {infoId === item.id && (
+                    <div className="px-4 pb-3 text-xs text-gray-500 bg-blue-50 border-t border-blue-100">
+                      <span>Lançado por <strong className="text-gray-700">{item.usuario?.nome || '-'}</strong> em {formatDateTime(item.created_at)}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -204,13 +218,23 @@ export default function LancamentosPage() {
                         {formatCurrency(parseFloat(String(item.valor)))}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="relative flex items-center justify-end gap-2">
+                          <button onClick={() => setInfoId(infoId === item.id ? null : item.id)} className="text-gray-400 hover:text-blue-600 transition-colors">
+                            <InformationCircleIcon className="h-5 w-5" />
+                          </button>
                           <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-primary-600 transition-colors">
                             <PencilSquareIcon className="h-5 w-5" />
                           </button>
                           <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-600 transition-colors">
                             <TrashIcon className="h-5 w-5" />
                           </button>
+                          {infoId === item.id && (
+                            <div className="absolute right-0 bottom-full mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10">
+                              <div>Lançado por <strong>{item.usuario?.nome || '-'}</strong></div>
+                              <div>em {formatDateTime(item.created_at)}</div>
+                              <div className="absolute right-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>

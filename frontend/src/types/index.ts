@@ -84,6 +84,7 @@ export interface Lancamento {
   destino: Destino | null;
   etiqueta: Etiqueta;
   tipo_pagamento: TipoPagamento;
+  usuario: { nome: string; nome_usuario: string } | null;
   created_at: string;
   updated_at: string;
 }
@@ -144,6 +145,9 @@ export interface ExtratoItem {
   destino: Destino | null;
   etiqueta: Etiqueta;
   tipo_pagamento: TipoPagamento;
+  loja: Loja | null;
+  usuario: { nome: string; nome_usuario: string } | null;
+  created_at: string;
 }
 
 export interface ExtratoResponse {

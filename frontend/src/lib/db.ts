@@ -7,13 +7,17 @@ declare global {
 
 function getPool(): Pool {
   if (!global._pgPool) {
-    global._pgPool = new Pool({
+    const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.DATABASE_URL?.includes('localhost')
         ? false
         : { rejectUnauthorized: false },
       max: 5,
     });
+    pool.on('connect', (client) => {
+      client.query("SET timezone = 'America/Sao_Paulo'");
+    });
+    global._pgPool = pool;
   }
   return global._pgPool;
 }

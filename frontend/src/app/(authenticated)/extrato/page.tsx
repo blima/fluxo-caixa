@@ -8,19 +8,21 @@ import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import DateInput from '@/components/ui/DateInput';
 import EmptyState from '@/components/ui/EmptyState';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import {
   DocumentTextIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   ScaleIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 
 export default function ExtratoPage() {
   const [itens, setItens] = useState<ExtratoItem[]>([]);
   const [totais, setTotais] = useState<ExtratoTotais | null>(null);
   const [loading, setLoading] = useState(true);
+  const [infoId, setInfoId] = useState<string | null>(null);
   const { lojaId } = useLoja();
   const [de, setDe] = useState(() => {
     const now = new Date();
@@ -67,12 +69,12 @@ export default function ExtratoPage() {
           </h1>
           <p className="text-sm text-gray-500">Visão detalhada com valores bruto e líquido</p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex-1 sm:flex-none">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex-1 min-w-0 sm:flex-none sm:w-40">
             <DateInput value={de} onChange={setDe} />
           </div>
-          <span className="text-gray-400 text-xs">até</span>
-          <div className="flex-1 sm:flex-none">
+          <span className="text-gray-400 text-xs flex-shrink-0">até</span>
+          <div className="flex-1 min-w-0 sm:flex-none sm:w-40">
             <DateInput value={ate} onChange={setAte} />
           </div>
         </div>
@@ -138,27 +140,39 @@ export default function ExtratoPage() {
             {/* Mobile card layout */}
             <div className="sm:hidden divide-y divide-gray-100">
               {itens.map((item) => (
-                <div key={item.id} className={`px-4 py-3 ${item.tipo === 'receita' ? 'bg-green-50/50' : 'bg-red-50/50'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className={`flex-shrink-0 p-1 rounded-lg ${item.tipo === 'receita' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
-                        {item.tipo === 'receita'
-                          ? <ArrowTrendingUpIcon className="h-3.5 w-3.5 text-emerald-600" />
-                          : <ArrowTrendingDownIcon className="h-3.5 w-3.5 text-rose-600" />
-                        }
+                <div key={item.id} className={`${item.tipo === 'receita' ? 'bg-green-50/50' : 'bg-red-50/50'}`}>
+                  <div className="px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`flex-shrink-0 p-1 rounded-lg ${item.tipo === 'receita' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+                          {item.tipo === 'receita'
+                            ? <ArrowTrendingUpIcon className="h-3.5 w-3.5 text-emerald-600" />
+                            : <ArrowTrendingDownIcon className="h-3.5 w-3.5 text-rose-600" />
+                          }
+                        </div>
+                        <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 truncate">{item.descricao}</span>
+                      <div className="flex items-center gap-2 ml-2">
+                        <span className={`text-sm font-semibold whitespace-nowrap ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(item.valor_liquido)}
+                        </span>
+                        <button onClick={() => setInfoId(infoId === item.id ? null : item.id)} className="text-gray-400 hover:text-blue-600 transition-colors">
+                          <InformationCircleIcon className="h-4.5 w-4.5" />
+                        </button>
+                      </div>
                     </div>
-                    <span className={`text-sm font-semibold ml-2 whitespace-nowrap ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrency(item.valor_liquido)}
-                    </span>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap text-xs">
+                      <span className="text-gray-500">{formatDate(item.data_evento)}</span>
+                      <span className="text-gray-400">Bruto: {formatCurrency(item.valor_bruto)}</span>
+                      {item.taxa > 0 && <span className="text-orange-500">Taxa: {item.taxa}%</span>}
+                      {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap text-xs">
-                    <span className="text-gray-500">{formatDate(item.data_evento)}</span>
-                    <span className="text-gray-400">Bruto: {formatCurrency(item.valor_bruto)}</span>
-                    {item.taxa > 0 && <span className="text-orange-500">Taxa: {item.taxa}%</span>}
-                    {item.etiqueta && <Badge color={item.etiqueta.cor}>{item.etiqueta.nome}</Badge>}
-                  </div>
+                  {infoId === item.id && (
+                    <div className="px-4 pb-3 text-xs text-gray-500 bg-blue-50 border-t border-blue-100">
+                      <span>Lançado por <strong className="text-gray-700">{item.usuario?.nome || '-'}</strong> em {formatDateTime(item.created_at)}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -175,6 +189,7 @@ export default function ExtratoPage() {
                     <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Taxa%</th>
                     <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor Taxa</th>
                     <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Valor Líquido</th>
+                    <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Info</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -204,6 +219,20 @@ export default function ExtratoPage() {
                       </td>
                       <td className={`px-6 py-4 text-sm font-semibold text-right ${item.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
                         {formatCurrency(item.valor_liquido)}
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <div className="relative inline-block">
+                          <button onClick={() => setInfoId(infoId === item.id ? null : item.id)} className="text-gray-400 hover:text-blue-600 transition-colors">
+                            <InformationCircleIcon className="h-5 w-5" />
+                          </button>
+                          {infoId === item.id && (
+                            <div className="absolute right-0 bottom-full mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10 text-left">
+                              <div>Lançado por <strong>{item.usuario?.nome || '-'}</strong></div>
+                              <div>em {formatDateTime(item.created_at)}</div>
+                              <div className="absolute right-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

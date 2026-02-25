@@ -31,18 +31,20 @@ export async function GET(request: NextRequest) {
   }
 
   const rows = await query<any>(
-    `SELECT l.id, l.tipo, l.descricao, l.data_evento, l.valor, l.taxa,
+    `SELECT l.id, l.tipo, l.descricao, l.data_evento, l.valor, l.taxa, l.created_at,
       row_to_json(o) as origem,
       row_to_json(d) as destino,
       row_to_json(e) as etiqueta,
       row_to_json(tp) as tipo_pagamento,
-      row_to_json(lo) as loja
+      row_to_json(lo) as loja,
+      json_build_object('nome', u.nome, 'nome_usuario', u.nome_usuario) as usuario
     FROM lancamentos l
     LEFT JOIN origens o ON o.id = l.origem_id
     LEFT JOIN destinos d ON d.id = l.destino_id
     LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
     LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
     LEFT JOIN lojas lo ON lo.id = l.loja_id
+    LEFT JOIN users u ON u.id = l.usuario_id
     WHERE ${conditions.join(' AND ')}
     ORDER BY l.data_evento DESC, l.created_at DESC`,
     values,
@@ -83,6 +85,8 @@ export async function GET(request: NextRequest) {
       etiqueta: r.etiqueta,
       tipo_pagamento: r.tipo_pagamento,
       loja: r.loja,
+      usuario: r.usuario,
+      created_at: r.created_at,
     };
   });
 

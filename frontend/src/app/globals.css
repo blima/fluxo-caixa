@@ -38,8 +38,17 @@
 @media (max-width: 639px) {
   .date-input-custom {
     color: transparent !important;
+    max-width: 100%;
   }
   .date-input-custom::-webkit-datetime-edit {
     color: transparent;
+  }
+  .date-input-custom::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
   }
 }
