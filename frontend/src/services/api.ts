@@ -87,6 +87,14 @@ export const tiposPagamentoApi = {
   setPadrao: (id: string, tipo: 'receita' | 'despesa') => api.patch(`/tipos-pagamento/${id}/set-padrao?tipo=${tipo}`),
 };
 
+// Lojas
+export const lojasApi = {
+  list: (params?: Record<string, string>) => api.get('/lojas', { params }),
+  get: (id: string) => api.get(`/lojas/${id}`),
+  create: (data: any) => api.post('/lojas', data),
+  update: (id: string, data: any) => api.patch(`/lojas/${id}`, data),
+};
+
 // Lancamentos
 export const lancamentosApi = {
   list: (params?: Record<string, string>) =>

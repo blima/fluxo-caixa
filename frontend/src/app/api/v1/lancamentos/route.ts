@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   const etiqueta_id = searchParams.get('etiqueta_id');
   const origem_id = searchParams.get('origem_id');
   const destino_id = searchParams.get('destino_id');
+  const loja_id = searchParams.get('loja_id');
 
   const conditions: string[] = ['l.ativo = true', `l.usuario_id = $1`];
   const values: any[] = [user.id];
@@ -42,18 +43,24 @@ export async function GET(request: NextRequest) {
     conditions.push(`l.data_evento <= $${idx++}`);
     values.push(ate);
   }
+  if (loja_id) {
+    conditions.push(`l.loja_id = $${idx++}`);
+    values.push(loja_id);
+  }
 
   const rows = await query(
     `SELECT l.*,
       row_to_json(o) as origem,
       row_to_json(d) as destino,
       row_to_json(e) as etiqueta,
-      row_to_json(tp) as tipo_pagamento
+      row_to_json(tp) as tipo_pagamento,
+      row_to_json(lo) as loja
     FROM lancamentos l
     LEFT JOIN origens o ON o.id = l.origem_id
     LEFT JOIN destinos d ON d.id = l.destino_id
     LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
     LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
+    LEFT JOIN lojas lo ON lo.id = l.loja_id
     WHERE ${conditions.join(' AND ')}
     ORDER BY l.data_evento DESC, l.created_at DESC`,
     values,
@@ -68,13 +75,16 @@ export async function POST(request: NextRequest) {
     if (!user) return unauthorized();
 
     const body = await request.json();
-    const { tipo, descricao, valor, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id } = body;
+    const { tipo, descricao, valor, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id, loja_id } = body;
 
     if (tipo === 'receita' && !origem_id) {
       return badRequest('Receita deve ter uma origem');
     }
     if (tipo === 'despesa' && !destino_id) {
       return badRequest('Despesa deve ter um destino');
+    }
+    if (!loja_id) {
+      return badRequest('Loja é obrigatória');
     }
 
     // Buscar taxa do tipo de pagamento se não foi enviada
@@ -85,10 +95,10 @@ export async function POST(request: NextRequest) {
     }
 
     const inserted = await queryOne<any>(
-      `INSERT INTO lancamentos (tipo, descricao, valor, taxa, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id, usuario_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO lancamentos (tipo, descricao, valor, taxa, data_evento, origem_id, destino_id, etiqueta_id, tipo_pagamento_id, usuario_id, loja_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [tipo, descricao, valor, taxa, data_evento, origem_id || null, destino_id || null, etiqueta_id, tipo_pagamento_id, user.id],
+      [tipo, descricao, valor, taxa, data_evento, origem_id || null, destino_id || null, etiqueta_id, tipo_pagamento_id, user.id, loja_id],
     );
 
     const row = await queryOne(
@@ -96,12 +106,14 @@ export async function POST(request: NextRequest) {
         row_to_json(o) as origem,
         row_to_json(d) as destino,
         row_to_json(e) as etiqueta,
-        row_to_json(tp) as tipo_pagamento
+        row_to_json(tp) as tipo_pagamento,
+        row_to_json(lo) as loja
       FROM lancamentos l
       LEFT JOIN origens o ON o.id = l.origem_id
       LEFT JOIN destinos d ON d.id = l.destino_id
       LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
       LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
+      LEFT JOIN lojas lo ON lo.id = l.loja_id
       WHERE l.id = $1`,
       [inserted!.id],
     );

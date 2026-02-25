@@ -11,6 +11,7 @@ import {
   FlagIcon,
   CreditCardIcon,
   UsersIcon,
+  BuildingStorefrontIcon,
   Squares2X2Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -26,6 +27,7 @@ const navigation: NavItem[] = [
   {
     name: 'Cadastros',
     children: [
+      { name: 'Lojas', href: '/cadastros/lojas', icon: BuildingStorefrontIcon },
       { name: 'Origens', href: '/cadastros/origens', icon: MapPinIcon },
       { name: 'Destinos', href: '/cadastros/destinos', icon: FlagIcon },
       { name: 'Etiquetas', href: '/cadastros/etiquetas', icon: TagIcon },

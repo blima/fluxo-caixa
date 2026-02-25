@@ -8,12 +8,14 @@ async function findLancamentoWithRelations(id: string, userId: string) {
       row_to_json(o) as origem,
       row_to_json(d) as destino,
       row_to_json(e) as etiqueta,
-      row_to_json(tp) as tipo_pagamento
+      row_to_json(tp) as tipo_pagamento,
+      row_to_json(lo) as loja
     FROM lancamentos l
     LEFT JOIN origens o ON o.id = l.origem_id
     LEFT JOIN destinos d ON d.id = l.destino_id
     LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
     LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
+    LEFT JOIN lojas lo ON lo.id = l.loja_id
     WHERE l.id = $1 AND l.ativo = true AND l.usuario_id = $2`,
     [id, userId],
   );
@@ -56,7 +58,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const values: any[] = [];
     let idx = 1;
 
-    for (const key of ['tipo', 'descricao', 'valor', 'taxa', 'data_evento', 'origem_id', 'destino_id', 'etiqueta_id', 'tipo_pagamento_id']) {
+    for (const key of ['tipo', 'descricao', 'valor', 'taxa', 'data_evento', 'origem_id', 'destino_id', 'etiqueta_id', 'tipo_pagamento_id', 'loja_id']) {
       if (body[key] !== undefined) {
         fields.push(`${key} = $${idx++}`);
         values.push(body[key]);

@@ -22,6 +22,11 @@ export async function GET(request: NextRequest) {
     conditions.push(`l.data_evento <= $${idx++}`);
     values.push(ate);
   }
+  const loja_id = searchParams.get('loja_id');
+  if (loja_id) {
+    conditions.push(`l.loja_id = $${idx++}`);
+    values.push(loja_id);
+  }
 
   const rows = await query<any>(
     `SELECT o.nome, SUM(l.valor) as valor

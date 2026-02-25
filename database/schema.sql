@@ -105,6 +105,18 @@ CREATE TABLE tipos_pagamento (
 );
 
 -- ============================================
+-- TABELA: lojas
+-- ============================================
+CREATE TABLE lojas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(150) NOT NULL,
+    matriz BOOLEAN NOT NULL DEFAULT FALSE,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ============================================
 -- TABELA: lancamentos
 -- ============================================
 CREATE TABLE lancamentos (
@@ -120,6 +132,7 @@ CREATE TABLE lancamentos (
     etiqueta_id UUID NOT NULL REFERENCES etiquetas(id),
     tipo_pagamento_id UUID NOT NULL REFERENCES tipos_pagamento(id),
     usuario_id UUID NOT NULL REFERENCES users(id),
+    loja_id UUID NOT NULL REFERENCES lojas(id),
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

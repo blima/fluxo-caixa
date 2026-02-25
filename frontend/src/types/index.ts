@@ -39,6 +39,15 @@ export interface Etiqueta {
   updated_at: string;
 }
 
+export interface Loja {
+  id: string;
+  nome: string;
+  matriz: boolean;
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TipoPagamento {
   id: string;
   nome: string;
@@ -68,6 +77,8 @@ export interface Lancamento {
   etiqueta_id: string;
   tipo_pagamento_id: string;
   usuario_id: string;
+  loja_id: string;
+  loja: Loja;
   ativo: boolean;
   origem: Origem | null;
   destino: Destino | null;

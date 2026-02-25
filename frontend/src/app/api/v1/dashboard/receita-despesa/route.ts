@@ -22,6 +22,11 @@ export async function GET(request: NextRequest) {
     conditions.push(`data_evento <= $${idx++}`);
     values.push(ate);
   }
+  const loja_id = searchParams.get('loja_id');
+  if (loja_id) {
+    conditions.push(`loja_id = $${idx++}`);
+    values.push(loja_id);
+  }
 
   const rows = await query<any>(
     `SELECT

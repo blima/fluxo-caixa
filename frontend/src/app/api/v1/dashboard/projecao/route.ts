@@ -8,16 +8,22 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const meses = parseInt(searchParams.get('meses') || '6');
+  const loja_id = searchParams.get('loja_id');
 
   // Busca lançamentos a_prazo ativos do usuário
+  let projecaoConditions = `l.ativo = true AND l.usuario_id = $1 AND tp.modalidade = 'a_prazo'`;
+  const projecaoValues: any[] = [user.id];
+  if (loja_id) {
+    projecaoConditions += ' AND l.loja_id = $2';
+    projecaoValues.push(loja_id);
+  }
+
   const lancamentos = await query<any>(
     `SELECT l.tipo, l.valor, l.taxa, l.data_evento, tp.parcelas
      FROM lancamentos l
      JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
-     WHERE l.ativo = true
-       AND l.usuario_id = $1
-       AND tp.modalidade = 'a_prazo'`,
-    [user.id],
+     WHERE ${projecaoConditions}`,
+    projecaoValues,
   );
 
   // Calcula parcelas futuras distribuídas mês a mês

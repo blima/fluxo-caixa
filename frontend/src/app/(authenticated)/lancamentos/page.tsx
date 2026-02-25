@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { lancamentosApi } from '@/services/api';
-import { Lancamento } from '@/types';
+import { lancamentosApi, lojasApi } from '@/services/api';
+import { Lancamento, Loja } from '@/types';
 import Badge from '@/components/ui/Badge';
 import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
@@ -23,6 +23,8 @@ export default function LancamentosPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Lancamento | null>(null);
   const [filtroTipo, setFiltroTipo] = useState<'' | 'receita' | 'despesa'>('');
+  const [lojas, setLojas] = useState<Loja[]>([]);
+  const [lojaId, setLojaId] = useState('');
   const [de, setDe] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
@@ -33,13 +35,25 @@ export default function LancamentosPage() {
     return `${last.getFullYear()}-${String(last.getMonth() + 1).padStart(2, '0')}-${String(last.getDate()).padStart(2, '0')}`;
   });
 
+  useEffect(() => {
+    lojasApi.list().then((res) => {
+      const ativas = (res.data as Loja[]).filter((l: Loja) => l.ativo);
+      setLojas(ativas);
+      const matriz = ativas.find((l: Loja) => l.matriz);
+      if (matriz) setLojaId(matriz.id);
+      else if (ativas.length > 0) setLojaId(ativas[0].id);
+    });
+  }, []);
+
   const load = async () => {
+    if (!lojaId) return;
     setLoading(true);
     try {
       const params: Record<string, string> = {};
       if (filtroTipo) params.tipo = filtroTipo;
       if (de) params.de = de;
       if (ate) params.ate = ate;
+      if (lojaId) params.loja_id = lojaId;
       const res = await lancamentosApi.list(params);
       setItems(res.data);
     } catch {
@@ -51,7 +65,7 @@ export default function LancamentosPage() {
 
   useEffect(() => {
     load();
-  }, [filtroTipo, de, ate]);
+  }, [filtroTipo, de, ate, lojaId]);
 
   const handleRemove = async (id: string) => {
     if (!confirm('Excluir este lançamento?')) return;
@@ -97,20 +111,27 @@ export default function LancamentosPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <select className="input-field text-sm" value={lojaId} onChange={(e) => setLojaId(e.target.value)}>
+            {lojas.map((l) => (
+              <option key={l.id} value={l.id}>{l.nome}{l.matriz ? ' (Matriz)' : ''}</option>
+            ))}
+          </select>
           <select className="input-field text-sm" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value as any)}>
             <option value="">Todos</option>
             <option value="receita">Receitas</option>
             <option value="despesa">Despesas</option>
           </select>
         </div>
-        <div className="flex-1 sm:flex-none">
-          <DateInput value={de} onChange={setDe} />
-        </div>
-        <span className="text-gray-400 text-xs">até</span>
-        <div className="flex-1 sm:flex-none">
-          <DateInput value={ate} onChange={setAte} />
+        <div className="flex items-center gap-2 flex-1 sm:flex-none">
+          <div className="flex-1 sm:flex-none">
+            <DateInput value={de} onChange={setDe} />
+          </div>
+          <span className="text-gray-400 text-xs">até</span>
+          <div className="flex-1 sm:flex-none">
+            <DateInput value={ate} onChange={setAte} />
+          </div>
         </div>
       </div>
 

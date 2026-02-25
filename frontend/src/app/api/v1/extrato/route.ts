@@ -12,21 +12,40 @@ export async function GET(request: NextRequest) {
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const ate = searchParams.get('ate') || `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
 
+  const conditions: string[] = ['l.ativo = true', 'l.usuario_id = $1'];
+  const values: any[] = [user.id];
+  let idx = 2;
+
+  if (de) {
+    conditions.push(`l.data_evento >= $${idx++}`);
+    values.push(de);
+  }
+  if (ate) {
+    conditions.push(`l.data_evento <= $${idx++}`);
+    values.push(ate);
+  }
+  const loja_id = searchParams.get('loja_id');
+  if (loja_id) {
+    conditions.push(`l.loja_id = $${idx++}`);
+    values.push(loja_id);
+  }
+
   const rows = await query<any>(
     `SELECT l.id, l.tipo, l.descricao, l.data_evento, l.valor, l.taxa,
       row_to_json(o) as origem,
       row_to_json(d) as destino,
       row_to_json(e) as etiqueta,
-      row_to_json(tp) as tipo_pagamento
+      row_to_json(tp) as tipo_pagamento,
+      row_to_json(lo) as loja
     FROM lancamentos l
     LEFT JOIN origens o ON o.id = l.origem_id
     LEFT JOIN destinos d ON d.id = l.destino_id
     LEFT JOIN etiquetas e ON e.id = l.etiqueta_id
     LEFT JOIN tipos_pagamento tp ON tp.id = l.tipo_pagamento_id
-    WHERE l.ativo = true AND l.usuario_id = $1
-      AND l.data_evento >= $2 AND l.data_evento <= $3
+    LEFT JOIN lojas lo ON lo.id = l.loja_id
+    WHERE ${conditions.join(' AND ')}
     ORDER BY l.data_evento DESC, l.created_at DESC`,
-    [user.id, de, ate],
+    values,
   );
 
   let receitas_bruto = 0, receitas_taxa = 0, receitas_liquido = 0;
@@ -63,6 +82,7 @@ export async function GET(request: NextRequest) {
       destino: r.destino,
       etiqueta: r.etiqueta,
       tipo_pagamento: r.tipo_pagamento,
+      loja: r.loja,
     };
   });
 
