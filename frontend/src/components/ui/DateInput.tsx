@@ -15,10 +15,10 @@ function formatDateBR(isoDate: string): string {
 
 export default function DateInput({ value, onChange, className = 'input-field text-sm', required }: DateInputProps) {
   return (
-    <div className="relative min-w-0">
+    <div className="relative min-w-0 overflow-hidden">
       <input
         type="date"
-        className={`${className} sm:text-transparent-none date-input-custom`}
+        className={`${className} date-input-custom`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}

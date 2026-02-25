@@ -34,14 +34,26 @@
   }
 }
 
-/* Mobile: esconde o texto nativo do date input quando há overlay */
+/* Mobile: esconde o texto nativo do date input e usa overlay customizado */
 @media (max-width: 639px) {
   .date-input-custom {
     color: transparent !important;
-    max-width: 100%;
+    min-width: 0 !important;
+    width: 100% !important;
   }
   .date-input-custom::-webkit-datetime-edit {
     color: transparent;
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+  }
+  .date-input-custom::-webkit-datetime-edit-fields-wrapper {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
   }
   .date-input-custom::-webkit-calendar-picker-indicator {
     opacity: 0;
@@ -50,5 +62,9 @@
     width: 100%;
     height: 100%;
     cursor: pointer;
+  }
+  .date-input-custom::-webkit-inner-spin-button,
+  .date-input-custom::-webkit-clear-button {
+    display: none;
   }
 }
