@@ -236,12 +236,14 @@ export default function DashboardPage() {
           size: '60%',
           labels: {
             show: true,
+            name: { fontSize: '11px' },
+            value: { fontSize: '13px', formatter: (val: string) => formatCurrency(parseFloat(val)) },
             total: {
               show: true,
               label: 'Total',
+              fontSize: '11px',
               formatter: () => formatCurrency(etiquetaValues.reduce((a, b) => a + b, 0)),
             },
-            value: { formatter: (val: string) => formatCurrency(parseFloat(val)) },
           },
         },
       },
