@@ -10,11 +10,11 @@ export async function GET(request: NextRequest) {
   const meses = parseInt(searchParams.get('meses') || '6');
   const loja_id = searchParams.get('loja_id');
 
-  // Busca lançamentos a_prazo ativos do usuário
-  let projecaoConditions = `l.ativo = true AND l.usuario_id = $1 AND tp.modalidade = 'a_prazo'`;
-  const projecaoValues: any[] = [user.id];
+  // Busca lançamentos a_prazo ativos
+  let projecaoConditions = `l.ativo = true AND tp.modalidade = 'a_prazo'`;
+  const projecaoValues: any[] = [];
   if (loja_id) {
-    projecaoConditions += ' AND l.loja_id = $2';
+    projecaoConditions += ' AND l.loja_id = $1';
     projecaoValues.push(loja_id);
   }
 

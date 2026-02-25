@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const ate = searchParams.get('ate') || `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
 
-  const conditions: string[] = ['l.ativo = true', 'l.usuario_id = $1'];
-  const values: any[] = [user.id];
-  let idx = 2;
+  const conditions: string[] = ['l.ativo = true'];
+  const values: any[] = [];
+  let idx = 1;
 
   if (de) {
     conditions.push(`l.data_evento >= $${idx++}`);

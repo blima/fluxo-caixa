@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
   const destino_id = searchParams.get('destino_id');
   const loja_id = searchParams.get('loja_id');
 
-  const conditions: string[] = ['l.ativo = true', `l.usuario_id = $1`];
-  const values: any[] = [user.id];
-  let idx = 2;
+  const conditions: string[] = ['l.ativo = true'];
+  const values: any[] = [];
+  let idx = 1;
 
   if (tipo) {
     conditions.push(`l.tipo = $${idx++}`);
