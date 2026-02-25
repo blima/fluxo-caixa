@@ -12,6 +12,28 @@ export async function GET(request: NextRequest) {
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
   const ate = searchParams.get('ate') || `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
 
+  const loja_id = searchParams.get('loja_id');
+
+  // Query saldo inicial (tudo antes do período)
+  const saldoConditions: string[] = ['ativo = true', `data_evento < $1`];
+  const saldoValues: any[] = [de];
+  let saldoIdx = 2;
+  if (loja_id) {
+    saldoConditions.push(`loja_id = $${saldoIdx++}`);
+    saldoValues.push(loja_id);
+  }
+  const saldoResult = await query<any>(
+    `SELECT
+      COALESCE(SUM(CASE WHEN tipo='receita' THEN valor - (valor * taxa / 100) ELSE 0 END), 0)
+      - COALESCE(SUM(CASE WHEN tipo='despesa' THEN valor + (valor * taxa / 100) ELSE 0 END), 0)
+      AS saldo_inicial
+    FROM lancamentos
+    WHERE ${saldoConditions.join(' AND ')}`,
+    saldoValues,
+  );
+  const saldo_inicial = Math.round(parseFloat(saldoResult[0]?.saldo_inicial || '0') * 100) / 100;
+
+  // Query lançamentos do período
   const conditions: string[] = ['l.ativo = true'];
   const values: any[] = [];
   let idx = 1;
@@ -24,7 +46,6 @@ export async function GET(request: NextRequest) {
     conditions.push(`l.data_evento <= $${idx++}`);
     values.push(ate);
   }
-  const loja_id = searchParams.get('loja_id');
   if (loja_id) {
     conditions.push(`l.loja_id = $${idx++}`);
     values.push(loja_id);
@@ -46,7 +67,7 @@ export async function GET(request: NextRequest) {
     LEFT JOIN lojas lo ON lo.id = l.loja_id
     LEFT JOIN users u ON u.id = l.usuario_id
     WHERE ${conditions.join(' AND ')}
-    ORDER BY l.data_evento DESC, l.created_at DESC`,
+    ORDER BY l.data_evento ASC, l.created_at ASC`,
     values,
   );
 
@@ -91,6 +112,7 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json({
+    saldo_inicial,
     itens,
     totais: {
       receitas_bruto: Math.round(receitas_bruto * 100) / 100,

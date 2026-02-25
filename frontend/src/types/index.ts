@@ -151,6 +151,7 @@ export interface ExtratoItem {
 }
 
 export interface ExtratoResponse {
+  saldo_inicial: number;
   itens: ExtratoItem[];
   totais: ExtratoTotais;
 }
